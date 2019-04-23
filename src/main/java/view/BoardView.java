@@ -3,6 +3,7 @@ package view;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -19,11 +20,12 @@ public class BoardView extends JPanel {
     private BufferedImage blackCell;
     private Stroke borderStroke = new BasicStroke(8);
 
-    BoardView() throws IOException {
+    BoardView(MouseListener inputConsumer) throws IOException {
         whiteCell = ImageIO.read(new File(IMAGE_WHITE_CELL));
         blackCell = ImageIO.read(new File(IMAGE_BLACK_CELL));
         Dimension size = new Dimension(WIDTH, HEIGHT);
         setPreferredSize(size);
+        addMouseListener(inputConsumer);
     }
 
     @Override
@@ -46,4 +48,5 @@ public class BoardView extends JPanel {
             g.drawImage(cell, x, y, null);
         }
     }
+
 }

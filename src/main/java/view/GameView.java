@@ -2,6 +2,7 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 
 public class GameView extends JFrame {
@@ -10,18 +11,18 @@ public class GameView extends JFrame {
     private static final int WINDOW_WIDTH = 1024;
     private static final int WINDOW_HEIGHT = 768;
 
-    public void initialize() {
+    public void initialize(MouseListener consumer) {
         setVisible(true);
-        createWindowContent();
+        createWindowContent(consumer);
         pack();
     }
 
-    private void createWindowContent() {
+    private void createWindowContent(MouseListener consumer) {
         JPanel gamePanel = new JPanel();
-        gamePanel.setPreferredSize(new Dimension(WINDOW_WIDTH,WINDOW_HEIGHT));
+        gamePanel.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
         BoardView boardView;
         try {
-            boardView = new BoardView();
+            boardView = new BoardView(consumer);
             gamePanel.add(boardView);
             add(gamePanel);
         } catch (IOException e) {
