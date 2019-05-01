@@ -10,7 +10,7 @@ public class Session implements MouseListener {
     private Board board = new Board();
     private Player turn;
 
-    public void begin(Player p1, Player p2) {
+    public void initialize(Player p1, Player p2) {
         this.p1 = p1;
         this.p2 = p2;
         turn = Math.random() > 0.5f ? p1 : p2;
@@ -42,5 +42,17 @@ public class Session implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 //Nothing yet...
+    }
+
+    public Player getPlayer1() {
+        return p1;
+    }
+
+    public Player getPlayer2() {
+        return p2;
+    }
+
+    public Player getCurrentTurn() {
+        return turn;
     }
 }
