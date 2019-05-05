@@ -7,11 +7,9 @@ public class ScoreLabel extends DamkaLabel implements ScoreChangedSubscriber {
     private final Player player;
 
     ScoreLabel(Player player) {
-        super();
+        super(String.format(PLAYER_SCORE, player.getName(), 0),player.getColor());
         this.player = player;
         player.subscribeForScoreChange(this);
-        setText(String.format(PLAYER_SCORE, player.getName(), 0));
-        setForeground(player.getColor());
     }
 
     @Override

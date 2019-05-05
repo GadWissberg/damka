@@ -1,55 +1,30 @@
 package view;
 
-import logic.Session;
-
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
-public class GameView extends JFrame {
+public class GameView extends JPanel {
+    private static final String IMAGE_BACKGROUND = GameWindow.RSC_FOLDER + "background.jpg";
+    private BufferedImage backgroundImage;
 
-    private static final String MSG_LOAD_UP_FAILURE = "The game has failed to load up!";
-    private static final int WINDOW_WIDTH = 1024;
-    private static final int WINDOW_HEIGHT = 768;
-    private static final String LABEL_CURRENT_TURN = "Current turn: %s";
-
-    public void initialize(Session session) {
-        setVisible(true);
-        createWindowContent(session);
-        pack();
-    }
-
-    private void createWindowContent(Session session) {
-        JPanel gamePanel = new JPanel(new GridBagLayout());
-        gamePanel.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
+    public GameView(GridBagLayout gridBagLayout) {
+        super(gridBagLayout);
         try {
-            addLabel(gamePanel, new ScoreLabel(session.getPlayer1()), 0, 0);
-            addLabel(gamePanel, new ScoreLabel(session.getPlayer2()), 0, 2);
-            String currentTurnText = String.format(LABEL_CURRENT_TURN, session.getCurrentTurn().getName());
-            addLabel(gamePanel, new DamkaLabel(currentTurnText), 1, 0);
-            createBoard(session, gamePanel);
-            add(gamePanel);
+            backgroundImage = ImageIO.read(new File(IMAGE_BACKGROUND));
         } catch (IOException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, MSG_LOAD_UP_FAILURE);
-            System.exit(0);
         }
     }
 
-    private void createBoard(Session session, JPanel gamePanel) throws IOException {
-        BoardView boardView;
-        boardView = new BoardView(session);
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 1;
-        constraints.gridy = 1;
-        gamePanel.add(boardView, constraints);
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, null);
+        }
     }
-
-    private void addLabel(JPanel gamePanel, JLabel label, int gridX, int gridY) {
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = gridX;
-        constraints.gridy = gridY;
-        gamePanel.add(label, constraints);
-    }
-
 }

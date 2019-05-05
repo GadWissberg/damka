@@ -10,9 +10,8 @@ import java.io.IOException;
 
 public class BoardView extends JPanel {
     private static final int CELLS_IN_ROW = 8;
-    private static final String RSC_FOLDER = "src\\main\\resources\\";
-    private static final String IMAGE_WHITE_CELL = RSC_FOLDER + "white_cell.png";
-    private static final String IMAGE_BLACK_CELL = RSC_FOLDER + "black_cell.png";
+    private static final String IMAGE_WHITE_CELL = GameWindow.RSC_FOLDER + "white_cell.png";
+    private static final String IMAGE_BLACK_CELL = GameWindow.RSC_FOLDER + "black_cell.png";
     private static final int WIDTH = 512;
     private static final int HEIGHT = 512;
 

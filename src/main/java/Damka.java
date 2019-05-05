@@ -1,7 +1,7 @@
 import logic.Board;
 import logic.Player;
 import logic.Session;
-import view.GameView;
+import view.GameWindow;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +10,7 @@ public class Damka {
     public static void main(String... args) {
         /* ----------- SESSION TESTING ------------- */
         Session session = new Session();
-        GameView display = new GameView();
+        GameWindow display = new GameWindow();
         Player p1 = new Player("Trump", Color.RED);
         Player p2 = new Player("Bibi", Color.BLUE);
         session.initialize(p1, p2);
