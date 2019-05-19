@@ -4,11 +4,12 @@ import logic.Session;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 
 public class GameWindow extends JFrame {
 
-    public static final String RSC_FOLDER = "src\\main\\resources\\";
+    public static final String RSC_FOLDER = "src"+File.separator+"main"+File.separator+"resources"+File.separator;
     private static final String MSG_LOAD_UP_FAILURE = "The game has failed to load up!";
     private static final int WINDOW_WIDTH = 1024;
     private static final int WINDOW_HEIGHT = 768;
