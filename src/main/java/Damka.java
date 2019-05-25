@@ -1,3 +1,4 @@
+import logic.Json;
 import logic.Player;
 import logic.Session;
 import view.GameWindow;
@@ -15,5 +16,9 @@ public class Damka {
         display.initialize(session);
         display.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         display.setResizable(false);
+
+        // json test
+        Json j = new Json();
+        j.Encode(session);
     }
 }
