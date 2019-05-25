@@ -6,7 +6,7 @@ import java.awt.event.MouseListener;
 public class Session implements MouseListener {
     private Player p1;
     private Player p2;
-    //    Pawn selectedPawn; // TODO: Waiting for Pawn class.
+        PawnInterface selectedPawn; // TODO: Waiting for Pawn class.
     private Board board = new Board();
     private Player turn;
 

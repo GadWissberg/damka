@@ -1,7 +1,7 @@
 package logic;
 
 public class BoardPosition {
-    int row, col;
+    private int row, col;
 
     public BoardPosition(int row, int col) {
         this.row = row;
