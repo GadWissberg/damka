@@ -1,4 +1,5 @@
 import logic.Board;
+import logic.Json;
 import logic.Player;
 import logic.Session;
 import view.GameWindow;
@@ -25,5 +26,7 @@ public class Damka {
         if (board.spotOnBoardIsFree(0,0))
             System.out.println("This spot is free");
 
+        Json j = new Json();
+        j.Encode(session);
     }
 }

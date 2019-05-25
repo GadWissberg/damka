@@ -28,6 +28,10 @@ public class Player {
         }
     }
 
+    public int getScore() {
+        return score;
+    }
+
     public void subscribeForScoreChange(ScoreChangedSubscriber subscriber) {
         scoreChangedSubscribers.add(subscriber);
     }
