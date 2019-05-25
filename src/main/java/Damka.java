@@ -1,4 +1,3 @@
-import logic.Board;
 import logic.Player;
 import logic.Session;
 import view.GameWindow;
@@ -15,6 +14,6 @@ public class Damka {
         session.initialize(p1, p2);
         display.initialize(session);
         display.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
+        display.setResizable(false);
     }
 }

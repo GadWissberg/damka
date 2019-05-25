@@ -6,7 +6,7 @@ import java.awt.event.MouseListener;
 public class Session implements MouseListener {
     private Player p1;
     private Player p2;
-        PawnInterface selectedPawn; // TODO: Waiting for Pawn class.
+    PawnInterface selectedPawn;
     private Board board = new Board();
     private Player turn;
 
@@ -14,6 +14,7 @@ public class Session implements MouseListener {
         this.p1 = p1;
         this.p2 = p2;
         turn = Math.random() > 0.5f ? p1 : p2;
+        board.fillBoard();
     }
 
     @Override
