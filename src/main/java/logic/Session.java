@@ -55,4 +55,8 @@ public class Session implements MouseListener {
     public Player getCurrentTurn() {
         return turn;
     }
+
+    public Board getBoard() {
+        return board;
+    }
 }
