@@ -1,5 +1,7 @@
 package logic;
 
+import logic.pawn.PawnInterface;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -14,7 +16,7 @@ public class Session implements MouseListener {
         this.p1 = p1;
         this.p2 = p2;
         turn = Math.random() > 0.5f ? p1 : p2;
-        board.fillBoard();
+        board.fillBoard(p1, p2);
     }
 
     @Override
