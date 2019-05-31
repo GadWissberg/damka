@@ -40,7 +40,7 @@ public class GameWindow extends JFrame {
 
     private void createBoard(Session session, JPanel gamePanel) throws IOException {
         BoardView boardView;
-        boardView = new BoardView(session);
+        boardView = new BoardView(session, session.getBoard());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 1;
         constraints.gridy = 1;

@@ -1,8 +1,7 @@
 import logic.Board;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+
+import static org.junit.Assert.*;
 
 
 public class DamkaTest {
@@ -10,7 +9,7 @@ public class DamkaTest {
     @Test()
     public void testBoardClass() {
         Board board = new Board();
-        board.fillBoard();
+        board.fillBoard(p1, p2);
         board.printBoard();
         assertEquals(board.getNumOfBluePawns(), 12);
         assertEquals(board.getNumOfRedPawns(), 12);
