@@ -35,4 +35,5 @@ public class PawnTempImpl implements PawnInterface {
     public BoardPosition getPosition() {
         return null;
     }
+    //TODO: Add setters and getters for row and col. king is bonus for now. remove id.
 }
