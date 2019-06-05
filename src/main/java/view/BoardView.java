@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class BoardView extends JPanel {
-    private static final int CELLS_IN_ROW = 8;
     private static final String IMAGE_WHITE_CELL_PATH = GameWindow.RSC_FOLDER + "white_cell.png";
     private static final String IMAGE_BLACK_CELL_PATH = GameWindow.RSC_FOLDER + "black_cell.png";
     private static final String IMAGE_BLUE_PAWN_PATH = GameWindow.RSC_FOLDER + "blue.png";
@@ -54,16 +53,16 @@ public class BoardView extends JPanel {
     }
 
     private void drawCellsAndPawns(Graphics g) {
-        for (int i = 0; i < CELLS_IN_ROW * CELLS_IN_ROW; i++) {
+        for (int i = 0; i < Board.CELLS_IN_ROW * Board.CELLS_IN_ROW; i++) {
             drawCell(i, g);
             drawPawn(i, g);
         }
     }
 
     private void drawPawn(int i, Graphics g) {
-        int currentRow = i / CELLS_IN_ROW;
-        int currentCol = i % CELLS_IN_ROW;
-        int x = (i % CELLS_IN_ROW) * whiteCellImage.getWidth();
+        int currentRow = i / Board.CELLS_IN_ROW;
+        int currentCol = i % Board.CELLS_IN_ROW;
+        int x = (i % Board.CELLS_IN_ROW) * whiteCellImage.getWidth();
         int y = currentRow * whiteCellImage.getHeight();
         PawnInterface pawnAtCurrentCell = board.getPawnAtPosition(currentRow, currentCol);
         if (pawnAtCurrentCell != null) {
@@ -72,12 +71,12 @@ public class BoardView extends JPanel {
     }
 
     private void drawCell(int i, Graphics g) {
-        int currentRow = i / CELLS_IN_ROW;
+        int currentRow = i / Board.CELLS_IN_ROW;
         boolean isIndexEven = i % 2 == 0;
         boolean isCurrentRowEven = currentRow % 2 == 0;
         BufferedImage cell = isCurrentRowEven ? (isIndexEven ? blackCellImage : whiteCellImage)
                 : isIndexEven ? whiteCellImage : blackCellImage;
-        int x = (i % CELLS_IN_ROW) * cell.getWidth();
+        int x = (i % Board.CELLS_IN_ROW) * cell.getWidth();
         int y = currentRow * cell.getHeight();
         g.drawImage(cell, x, y, null);
     }
