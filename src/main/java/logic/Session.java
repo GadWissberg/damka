@@ -2,6 +2,7 @@ package logic;
 
 import interfaces.InputConsumer;
 import interfaces.OutputSubscriber;
+import logic.pawn.PawnTempImpl;
 
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 public class Session implements InputConsumer {
     private Player p1;
     private Player p2;
-//    PawnInterface selectedPawn;
+    PawnTempImpl selectedPawn;
     private Board board = new Board();
     private Player turn;
     private int cellWidth;
@@ -25,12 +26,14 @@ public class Session implements InputConsumer {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-//        PawnInterface pawnAtPosition = board.getPawnAtPosition(x / cellWidth, y / cellHeight);
-//        if (pawnAtPosition != null && pawnAtPosition.getPlayer() == turn) {
-//            subscribersForOutput.forEach(subscriber.showSelection());
-//        }
+        int row = e.getY() / cellWidth;
+        int column = e.getX() / cellHeight;
+        PawnTempImpl pawnAtPosition = board.getPawnAtPosition(row, column);
+        if (pawnAtPosition != null && pawnAtPosition.getPlayer() == turn) {
+            selectedPawn = pawnAtPosition;
+            subscribersForOutput.forEach(subscriber -> subscriber.setSelectionImage(column * cellWidth,
+                    row * cellHeight));
+        }
     }
 
     @Override
@@ -72,6 +75,7 @@ public class Session implements InputConsumer {
     @Override
     public void setCellSize(int width, int height) {
         cellWidth = width;
+        cellHeight = height;
     }
 
     @Override

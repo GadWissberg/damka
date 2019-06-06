@@ -17,6 +17,7 @@ public class BoardView extends JPanel implements OutputSubscriber {
     private static final String IMAGE_BLACK_CELL_PATH = GameWindow.RSC_FOLDER + "black_cell.png";
     private static final String IMAGE_BLUE_PAWN_PATH = GameWindow.RSC_FOLDER + "blue.png";
     private static final String IMAGE_RED_PAWN_PATH = GameWindow.RSC_FOLDER + "red.png";
+    private static final String IMAGE_SELECTION_PATH = GameWindow.RSC_FOLDER + "selection.png";
     private static final int WIDTH = 512;
     private static final int HEIGHT = 512;
 
@@ -26,7 +27,9 @@ public class BoardView extends JPanel implements OutputSubscriber {
     private BufferedImage blackCellImage;
     private BufferedImage bluePawnImage;
     private BufferedImage redPawnImage;
+    private BufferedImage selectionImage;
     private Stroke borderStroke = new BasicStroke(8);
+    private SelectionComponent selectionComponent = new SelectionComponent();
 
     BoardView(InputConsumer inputConsumer, Board board) throws IOException {
         this.board = board;
@@ -34,7 +37,7 @@ public class BoardView extends JPanel implements OutputSubscriber {
         Dimension size = new Dimension(WIDTH, HEIGHT);
         setPreferredSize(size);
         addMouseListener(inputConsumer);
-        inputConsumer.setCellSize(whiteCellImage.getWidth(),whiteCellImage.getHeight());
+        inputConsumer.setCellSize(whiteCellImage.getWidth(), whiteCellImage.getHeight());
         inputConsumer.subscribeForOutput(this);
     }
 
@@ -43,6 +46,7 @@ public class BoardView extends JPanel implements OutputSubscriber {
         blackCellImage = ImageIO.read(new File(IMAGE_BLACK_CELL_PATH));
         bluePawnImage = ImageIO.read(new File(IMAGE_BLUE_PAWN_PATH));
         redPawnImage = ImageIO.read(new File(IMAGE_RED_PAWN_PATH));
+        selectionImage = ImageIO.read(new File(IMAGE_SELECTION_PATH));
     }
 
     @Override
@@ -53,6 +57,8 @@ public class BoardView extends JPanel implements OutputSubscriber {
         g.setColor(Color.BLACK);
         gt.setStroke(borderStroke);
         g.drawRect(0, 0, 512, 512);
+        if (selectionComponent.visible)
+            g.drawImage(selectionImage, selectionComponent.x, selectionComponent.y, null);
     }
 
     private void drawCellsAndPawns(Graphics g) {
@@ -84,4 +90,29 @@ public class BoardView extends JPanel implements OutputSubscriber {
         g.drawImage(cell, x, y, null);
     }
 
+    @Override
+    public void setSelectionImage(int x, int y) {
+        selectionComponent.setPosition(x, y);
+        selectionComponent.setVisible(true);
+        repaint();
+    }
+
+    private class SelectionComponent {
+        private int x;
+        private int y;
+        private boolean visible;
+
+        public SelectionComponent() {
+            setVisible(false);
+        }
+
+        public void setPosition(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        public void setVisible(boolean b) {
+            visible = b;
+        }
+    }
 }
