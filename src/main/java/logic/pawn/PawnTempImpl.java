@@ -5,7 +5,7 @@ import logic.Player;
 
 import java.awt.*;
 
-public class PawnTempImpl implements PawnInterface {
+public class PawnTempImpl {
     private final Player player;
     private final int row;
     private final int column;
@@ -16,22 +16,18 @@ public class PawnTempImpl implements PawnInterface {
         this.column = column;
     }
 
-    @Override
     public String toString() {
         return player.getColor() == Color.RED ? "R" : "B";
     }
 
-    @Override
     public int getId() {
         return 0;
     }
 
-    @Override
     public Player getPlayer() {
         return player;
     }
 
-    @Override
     public BoardPosition getPosition() {
         return null;
     }

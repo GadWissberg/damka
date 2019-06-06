@@ -1,17 +1,18 @@
 package view;
 
+import interfaces.InputConsumer;
+import interfaces.OutputSubscriber;
 import logic.Board;
-import logic.pawn.PawnInterface;
+import logic.pawn.PawnTempImpl;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class BoardView extends JPanel {
+public class BoardView extends JPanel implements OutputSubscriber {
     private static final String IMAGE_WHITE_CELL_PATH = GameWindow.RSC_FOLDER + "white_cell.png";
     private static final String IMAGE_BLACK_CELL_PATH = GameWindow.RSC_FOLDER + "black_cell.png";
     private static final String IMAGE_BLUE_PAWN_PATH = GameWindow.RSC_FOLDER + "blue.png";
@@ -27,12 +28,14 @@ public class BoardView extends JPanel {
     private BufferedImage redPawnImage;
     private Stroke borderStroke = new BasicStroke(8);
 
-    BoardView(MouseListener inputConsumer, Board board) throws IOException {
+    BoardView(InputConsumer inputConsumer, Board board) throws IOException {
         this.board = board;
         initializeImages();
         Dimension size = new Dimension(WIDTH, HEIGHT);
         setPreferredSize(size);
         addMouseListener(inputConsumer);
+        inputConsumer.setCellSize(whiteCellImage.getWidth(),whiteCellImage.getHeight());
+        inputConsumer.subscribeForOutput(this);
     }
 
     private void initializeImages() throws IOException {
@@ -64,7 +67,7 @@ public class BoardView extends JPanel {
         int currentCol = i % Board.CELLS_IN_ROW;
         int x = (i % Board.CELLS_IN_ROW) * whiteCellImage.getWidth();
         int y = currentRow * whiteCellImage.getHeight();
-        PawnInterface pawnAtCurrentCell = board.getPawnAtPosition(currentRow, currentCol);
+        PawnTempImpl pawnAtCurrentCell = board.getPawnAtPosition(currentRow, currentCol);
         if (pawnAtCurrentCell != null) {
             g.drawImage(pawnAtCurrentCell.getPlayer().getColor() == Color.RED ? redPawnImage : bluePawnImage, x, y, null);
         }

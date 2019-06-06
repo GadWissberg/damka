@@ -1,16 +1,20 @@
 package logic;
 
-import logic.pawn.PawnInterface;
+import interfaces.InputConsumer;
+import interfaces.OutputSubscriber;
 
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
-public class Session implements MouseListener {
+public class Session implements InputConsumer {
     private Player p1;
     private Player p2;
-    PawnInterface selectedPawn;
+//    PawnInterface selectedPawn;
     private Board board = new Board();
     private Player turn;
+    private int cellWidth;
+    private int cellHeight;
+    private ArrayList<OutputSubscriber> subscribersForOutput = new ArrayList<>();
 
     public void initialize(Player p1, Player p2) {
         this.p1 = p1;
@@ -23,8 +27,10 @@ public class Session implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         int x = e.getX();
         int y = e.getY();
-        System.out.println("Mouse clicked: X:" + x + ", Y:" + y);
-//        Object cell = board.getCellByCoords(x, y); // TODO: This should return a cell object by X and Y.
+//        PawnInterface pawnAtPosition = board.getPawnAtPosition(x / cellWidth, y / cellHeight);
+//        if (pawnAtPosition != null && pawnAtPosition.getPlayer() == turn) {
+//            subscribersForOutput.forEach(subscriber.showSelection());
+//        }
     }
 
     @Override
@@ -61,5 +67,17 @@ public class Session implements MouseListener {
 
     public Board getBoard() {
         return board;
+    }
+
+    @Override
+    public void setCellSize(int width, int height) {
+        cellWidth = width;
+    }
+
+    @Override
+    public void subscribeForOutput(OutputSubscriber subscriber) {
+        if (!subscribersForOutput.contains(subscriber)) {
+            subscribersForOutput.add(subscriber);
+        }
     }
 }

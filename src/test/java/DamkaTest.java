@@ -9,7 +9,7 @@ public class DamkaTest {
     @Test()
     public void testBoardClass() {
         Board board = new Board();
-        board.fillBoard(p1, p2);
+//        board.fillBoard(p1, p2);
         board.printBoard();
         assertEquals(board.getNumOfBluePawns(), 12);
         assertEquals(board.getNumOfRedPawns(), 12);
