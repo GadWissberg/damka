@@ -19,6 +19,6 @@ public class Damka {
 
         // json test
         Json j = new Json();
-        j.Encode(session);
+        j.getAllSessionData(session);
     }
 }

@@ -1,67 +1,86 @@
 package logic;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import logic.pawn.Pawn;
 
-import javax.xml.ws.Response;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.lang.reflect.Array;
 
 public class Json {
     private static final String JSON_FILE = "src"+File.separator+"main"+File.separator+"game.json";
 
     // Encode game session to Json
-    public Gson Encode(Session s) {
-        Gson j = new Gson();
-
+    public void getAllSessionData(Session s) {
+        Gson js = new Gson();
         JsonArray arr = new JsonArray();
 
         // create objects for later use
         JsonObject o  = new JsonObject();
         JsonObject o2 = new JsonObject();
 
-        Player p;
+        Player p1, p2;
+        p1 = s.getPlayer1();
+        p2 = s.getPlayer2();
 
         // Player 1
-        p = s.getPlayer1();
-        o.addProperty("name", p.getName());
-        o.addProperty("color", p.getColor().toString());
-        o.addProperty("score", p.getScore());
+        o.addProperty("name", p1.getName());
+        o.addProperty("color", p1.toString());
+        o.addProperty("score", p1.getScore());
         o2.add("player1", o);
         arr.add(o2);
 
         // Player 2
-        p = s.getPlayer2();
         o = new JsonObject();
         o2 = new JsonObject();
-        o.addProperty("name", p.getName());
-        o.addProperty("color", p.getColor().toString());
-        o.addProperty("score", p.getScore());
+        o.addProperty("name", p2.getName());
+        o.addProperty("color", p2.toString());
+        o.addProperty("score", p2.getScore());
         o2.add("player2", o);
         arr.add(o2);
 
         // current turn
         o = new JsonObject();
-        o.addProperty("turn", s.getCurrentTurn().getName());
+
         arr.add(o);
 
         // board status
+        int size = Board.CELLS_IN_ROW; // board size
+
+        int i, j;
+        Board board = s.getBoard();
+        Pawn pawn;
+
+        String pawns[][] = new String[size][size];
+
+        String color;
+        for(i = 0; i < size; i++) {
+            for (j = 0; j < size; j++) {
+                pawn = board.getPawnAtPosition(i, j);
+                if(pawn == null)
+                    color = "";
+                else
+                    color = pawn.toString();
+
+                pawns[i][j] = color;
+            }
+        }
+
         o = new JsonObject();
-        JsonArray board = new JsonArray();
-        board.add("soon"); // TODO: write board status function, to deliver: board size and each player positions
-        o.add("board", board);
+        o2 = new JsonObject();
+        o2.addProperty("size", size);
+        o2.addProperty("pawns", js.toJson(pawns));
+        o2.addProperty("turn", s.getCurrentTurn().toString());
+        o.add("board", o2);
         arr.add(o);
 
-        System.out.println(j.toJson((arr)));
+        // TODO: delete before release
+        System.out.println(js.toJson((arr)));
 
-        return j;
+        //return js;
+        save2File(js);
     }
 
     private void save2File(Gson json) {

@@ -28,6 +28,10 @@ public class Player {
         }
     }
 
+    public String toString() {
+        return this.getColor() == Color.RED ? "R" : "B";
+    }
+
     public int getScore() {
         return score;
     }

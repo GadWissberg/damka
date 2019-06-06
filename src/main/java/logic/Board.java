@@ -2,6 +2,8 @@ package logic;
 
 import logic.pawn.Pawn;
 
+import java.lang.reflect.Array;
+
 public class Board {
     public static final int CELLS_IN_ROW = 8;
     private Pawn[][] board = new Pawn[CELLS_IN_ROW][CELLS_IN_ROW];
