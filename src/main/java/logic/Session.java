@@ -93,34 +93,30 @@ public class Session implements Controller {
         if(p == null) // no pawn selected
             return null;
 
-        ArrayList<BoardPosition> arr = new ArrayList();
+        ArrayList<Move> arr = new ArrayList();
         BoardPosition pawnPos = p.getPosition();
         int r, c;
 
         int pCol = pawnPos.getCol();
         int pRow = pawnPos.getRow();
-        if(p.getPlayer() == p1) { // logic for player 1
-            if(pRow+1 <= board.CELLS_IN_ROW) {
-                if (pCol - 1 >= 0) { // left move in bounds
-                    p = board.getPawnAtPosition(pRow + 1, pCol - 1);
-                    if (p == null) { // no player, move freely
-                        arr.add(new BoardPosition(pRow + 1, pCol - 1));
-                    } else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol - 2 >= 0) { // can eat
-                        arr.add(new BoardPosition(pRow + 2, pCol - 2));
-                    }
-                }
+        if(p.getPlayer() == p1 && pRow+1 <= board.CELLS_IN_ROW) { // logic for player 1
+            if (pCol - 1 >= 0) { // left move in bounds
+                p = board.getPawnAtPosition(pRow + 1, pCol - 1);
+                if (p == null) // no player, move freely
+                    arr.add(new Move(new BoardPosition(pRow + 1, pCol - 1), Move.MoveType.REGULAR));
+                else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol - 2 >= 0) // can eat
+                    arr.add(new Move(new BoardPosition(pRow + 2, pCol - 2), Move.MoveType.EAT));
+            }
 
-                if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
-                    p = board.getPawnAtPosition(pRow+1, pCol+1);
-                    if(p == null) // move freely
-                        arr.add(new BoardPosition(pRow + 1, pCol + 1));
-                    else if(p.getPlayer() == p2 && pRow+2 <= board.CELLS_IN_ROW && pCol+2 <= board.CELLS_IN_ROW)
-                        arr.add(new BoardPosition(pRow + 1, pCol + 1));
-                }
+            if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
+                p = board.getPawnAtPosition(pRow+1, pCol+1);
+                if(p == null) // move freely
+                    arr.add(new Move(new BoardPosition(pRow + 1, pCol + 1), Move.MoveType.REGULAR));
+                else if(p.getPlayer() == p2 && pRow+2 <= board.CELLS_IN_ROW && pCol+2 <= board.CELLS_IN_ROW) // can eat
+                    arr.add(new Move(new BoardPosition(pRow + 2, pCol + 2), Move.MoveType.EAT));
             }
         } else { // logic for player 2
-
-        arr.add(new BoardPosition(1,1));
+        }
 
         return arr;
     }
