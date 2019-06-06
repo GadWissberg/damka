@@ -4,17 +4,16 @@ import interfaces.InputConsumer;
 import interfaces.OutputSubscriber;
 import logic.pawn.Pawn;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class Session implements InputConsumer {
     private Player p1;
     private Player p2;
-    Pawn selectedPawn;
     private Board board = new Board();
     private Player turn;
-    private int cellWidth;
-    private int cellHeight;
+    private Rectangle cellSize = new Rectangle();
     private ArrayList<OutputSubscriber> subscribersForOutput = new ArrayList<>();
 
     public void initialize(Player p1, Player p2) {
@@ -26,13 +25,13 @@ public class Session implements InputConsumer {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        int row = e.getY() / cellWidth;
-        int column = e.getX() / cellHeight;
+        int row = (int) (e.getY() / cellSize.getWidth());
+        int column = (int) (e.getX() / cellSize.getHeight());
         Pawn pawnAtPosition = board.getPawnAtPosition(row, column);
         if (pawnAtPosition != null && pawnAtPosition.getPlayer() == turn) {
-            selectedPawn = pawnAtPosition;
-            subscribersForOutput.forEach(subscriber -> subscriber.setSelectionImage(column * cellWidth,
-                    row * cellHeight));
+            board.setSelectedPawn(pawnAtPosition);
+            subscribersForOutput.forEach(subscriber -> subscriber.setSelectionImage(column * cellSize.getWidth(),
+                    row * cellSize.getHeight()));
         }
     }
 
@@ -74,8 +73,7 @@ public class Session implements InputConsumer {
 
     @Override
     public void setCellSize(int width, int height) {
-        cellWidth = width;
-        cellHeight = height;
+        cellSize.setSize(width, height);
     }
 
     @Override

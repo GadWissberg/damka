@@ -7,6 +7,7 @@ public class Board {
     private Pawn[][] board = new Pawn[CELLS_IN_ROW][CELLS_IN_ROW];
     private int numOfBluePawns = 12;
     private int numOfRedPawns = 12;
+    private Pawn selectedPawn;
 
     public void fillBoard(Player p1, Player p2) {
         int evenRow = 0;
@@ -48,4 +49,7 @@ public class Board {
         return board[row][column];
     }
 
+    public void setSelectedPawn(Pawn pawn) {
+        selectedPawn = pawn;
+    }
 }

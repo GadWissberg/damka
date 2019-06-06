@@ -91,7 +91,7 @@ public class BoardView extends JPanel implements OutputSubscriber {
     }
 
     @Override
-    public void setSelectionImage(int x, int y) {
+    public void setSelectionImage(double x, double y) {
         selectionComponent.setPosition(x, y);
         selectionComponent.setVisible(true);
         repaint();
