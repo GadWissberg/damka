@@ -124,7 +124,22 @@ public class Session implements Controller {
                 else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol + 2 <= board.CELLS_IN_ROW) // can eat
                     arr.add(new Move(new BoardPosition(pRow + 2, pCol + 2), Move.MoveType.EAT));
             }
-        } else { // logic for player 2
+        } else if(pRow-1 >= 0){ // logic for player 2
+            if (pCol - 1 >= 0) { // left move in bounds
+                p = board.getPawnAtPosition(pRow - 1, pCol - 1);
+                if (p == null) // no player, move freely
+                    arr.add(new Move(new BoardPosition(pRow - 1, pCol - 1), Move.MoveType.REGULAR));
+                else if (p.getPlayer() == p1 && pRow - 2 >= 0 && pCol - 2 >= 0) // can eat
+                    arr.add(new Move(new BoardPosition(pRow - 2, pCol - 2), Move.MoveType.EAT));
+            }
+
+            if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
+                p = board.getPawnAtPosition(pRow-1, pCol+1);
+                if(p == null) // move freely
+                    arr.add(new Move(new BoardPosition(pRow - 1, pCol + 1), Move.MoveType.REGULAR));
+                else if(p.getPlayer() == p1 && pRow-2 >= 0 && pCol+2 <= board.CELLS_IN_ROW) // can eat
+                    arr.add(new Move(new BoardPosition(pRow - 2, pCol + 2), Move.MoveType.EAT));
+            }
         }
 
         return arr;
