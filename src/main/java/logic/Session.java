@@ -71,6 +71,15 @@ public class Session implements InputConsumer {
         return board;
     }
 
+    private boolean isMovable(int x, int y) {
+        Pawn selectedPawn;
+        selectedPawn = this.board.getSelectedPawn();
+        if(selectedPawn == null) // no pawn selected
+            return false;
+
+        return false;
+    }
+
     @Override
     public void setCellSize(int width, int height) {
         cellSize.setSize(width, height);
