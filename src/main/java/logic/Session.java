@@ -87,19 +87,42 @@ public class Session implements Controller {
         return board;
     }
 
-    private boolean isMovable(int x, int y) {
-        Pawn selectedPawn;
-        selectedPawn = this.board.getSelectedPawn();
-        if (selectedPawn == null) // no pawn selected
-            return false;
+    private ArrayList canMoveto() {
+        Pawn p;
+        p = this.board.getSelectedPawn();
+        if(p == null) // no pawn selected
+            return null;
 
-        if (selectedPawn.getPlayer().toString() == "R") { // reds are going down
+        ArrayList<BoardPosition> arr = new ArrayList();
+        BoardPosition pawnPos = p.getPosition();
+        int r, c;
 
-        } else {
+        int pCol = pawnPos.getCol();
+        int pRow = pawnPos.getRow();
+        if(p.getPlayer() == p1) { // logic for player 1
+            if(pRow+1 <= board.CELLS_IN_ROW) {
+                if (pCol - 1 >= 0) { // left move in bounds
+                    p = board.getPawnAtPosition(pRow + 1, pCol - 1);
+                    if (p == null) { // no player, move freely
+                        arr.add(new BoardPosition(pRow + 1, pCol - 1));
+                    } else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol - 2 >= 0) { // can eat
+                        arr.add(new BoardPosition(pRow + 2, pCol - 2));
+                    }
+                }
 
-        }
+                if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
+                    p = board.getPawnAtPosition(pRow+1, pCol+1);
+                    if(p == null) // move freely
+                        arr.add(new BoardPosition(pRow + 1, pCol + 1));
+                    else if(p.getPlayer() == p2 && pRow+2 <= board.CELLS_IN_ROW && pCol+2 <= board.CELLS_IN_ROW)
+                        arr.add(new BoardPosition(pRow + 1, pCol + 1));
+                }
+            }
+        } else { // logic for player 2
 
-        return false;
+        arr.add(new BoardPosition(1,1));
+
+        return arr;
     }
 
     @Override
