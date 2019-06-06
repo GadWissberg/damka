@@ -1,10 +1,10 @@
 package logic;
 
-import logic.pawn.PawnTempImpl;
+import logic.pawn.Pawn;
 
 public class Board {
     public static final int CELLS_IN_ROW = 8;
-    private PawnTempImpl[][] board = new PawnTempImpl[CELLS_IN_ROW][CELLS_IN_ROW];
+    private Pawn[][] board = new Pawn[CELLS_IN_ROW][CELLS_IN_ROW];
     private int numOfBluePawns = 12;
     private int numOfRedPawns = 12;
 
@@ -13,8 +13,8 @@ public class Board {
         for (int i = 0; i < 3; i++) {
             evenRow ^= 1;
             for (int j = 0; j < CELLS_IN_ROW - evenRow; j += 2) {
-                board[i][j + evenRow] = new PawnTempImpl(p1, i, j + evenRow);
-                board[7 - i][j + (evenRow ^ 1)] = new PawnTempImpl(p2, 7 - i, j + (evenRow ^ 1));
+                board[i][j + evenRow] = new Pawn(p1, i, j + evenRow);
+                board[7 - i][j + (evenRow ^ 1)] = new Pawn(p2, 7 - i, j + (evenRow ^ 1));
             }
         }
     }
@@ -44,7 +44,7 @@ public class Board {
         return this.board[row][column] == null;
     }
 
-    public PawnTempImpl getPawnAtPosition(int row, int column) {
+    public Pawn getPawnAtPosition(int row, int column) {
         return board[row][column];
     }
 

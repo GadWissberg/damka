@@ -2,7 +2,7 @@ package logic;
 
 import interfaces.InputConsumer;
 import interfaces.OutputSubscriber;
-import logic.pawn.PawnTempImpl;
+import logic.pawn.Pawn;
 
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class Session implements InputConsumer {
     private Player p1;
     private Player p2;
-    PawnTempImpl selectedPawn;
+    Pawn selectedPawn;
     private Board board = new Board();
     private Player turn;
     private int cellWidth;
@@ -28,7 +28,7 @@ public class Session implements InputConsumer {
     public void mouseClicked(MouseEvent e) {
         int row = e.getY() / cellWidth;
         int column = e.getX() / cellHeight;
-        PawnTempImpl pawnAtPosition = board.getPawnAtPosition(row, column);
+        Pawn pawnAtPosition = board.getPawnAtPosition(row, column);
         if (pawnAtPosition != null && pawnAtPosition.getPlayer() == turn) {
             selectedPawn = pawnAtPosition;
             subscribersForOutput.forEach(subscriber -> subscriber.setSelectionImage(column * cellWidth,

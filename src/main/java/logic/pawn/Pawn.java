@@ -5,12 +5,12 @@ import logic.Player;
 
 import java.awt.*;
 
-public class PawnTempImpl {
+public class Pawn {
     private final Player player;
     private final int row;
     private final int column;
 
-    public PawnTempImpl(Player player, int row, int column) {
+    public Pawn(Player player, int row, int column) {
         this.player = player;
         this.row = row;
         this.column = column;

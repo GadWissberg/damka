@@ -3,7 +3,7 @@ package view;
 import interfaces.InputConsumer;
 import interfaces.OutputSubscriber;
 import logic.Board;
-import logic.pawn.PawnTempImpl;
+import logic.pawn.Pawn;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -73,7 +73,7 @@ public class BoardView extends JPanel implements OutputSubscriber {
         int currentCol = i % Board.CELLS_IN_ROW;
         int x = (i % Board.CELLS_IN_ROW) * whiteCellImage.getWidth();
         int y = currentRow * whiteCellImage.getHeight();
-        PawnTempImpl pawnAtCurrentCell = board.getPawnAtPosition(currentRow, currentCol);
+        Pawn pawnAtCurrentCell = board.getPawnAtPosition(currentRow, currentCol);
         if (pawnAtCurrentCell != null) {
             g.drawImage(pawnAtCurrentCell.getPlayer().getColor() == Color.RED ? redPawnImage : bluePawnImage, x, y, null);
         }
