@@ -71,19 +71,28 @@ public class Session implements InputConsumer {
         return board;
     }
 
-    private boolean isMovable(int x, int y) {
+    private ArrayList canMoveto() {
         Pawn selectedPawn;
         selectedPawn = this.board.getSelectedPawn();
         if(selectedPawn == null) // no pawn selected
-            return false;
+            return null;
 
-        if(selectedPawn.getPlayer().toString() == "R") { // reds are going down
-
-        } else {
+        BoardPosition pawnPos = selectedPawn.getPosition();
+        int r;
+        for(r = pawnPos.getRow(); r < pawnPos.getRow()+2; r++) {
 
         }
 
-        return false;
+
+
+
+        ArrayList<BoardPosition> arr = new ArrayList();
+
+
+
+        arr.add(new BoardPosition(1,1));
+
+        return arr;
     }
 
     @Override

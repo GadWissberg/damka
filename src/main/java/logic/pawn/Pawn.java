@@ -7,13 +7,11 @@ import java.awt.*;
 
 public class Pawn {
     private final Player player;
-    private final int row;
-    private final int column;
+    private final BoardPosition position;
 
     public Pawn(Player player, int row, int column) {
         this.player = player;
-        this.row = row;
-        this.column = column;
+        this.position = new BoardPosition(row, column);
     }
 
     public String toString() {
@@ -29,7 +27,7 @@ public class Pawn {
     }
 
     public BoardPosition getPosition() {
-        return null;
+        return position;
     }
     //TODO: Add setters and getters for row and col. king is bonus for now. remove id.
 }
