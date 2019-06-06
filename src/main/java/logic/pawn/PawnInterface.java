@@ -3,10 +3,12 @@ package logic.pawn;
 import logic.BoardPosition;
 import logic.Player;
 
-public interface PawnInterface {
+
+public  interface PawnInterface {
+
     int getId();
 
-    Player getPlayer();
+     Player getPlayer();
 
     BoardPosition getPosition();
 }
