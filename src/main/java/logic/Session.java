@@ -42,9 +42,6 @@ public class Session implements Controller {
         }
     }
 
-    private void movePawn(int row, int column) {
-    }
-
     private void tryToSelectPawn(int row, int column) {
         Pawn pawnAtPosition = board.getPawnAtPosition(row, column);
         if (pawnAtPosition != null && pawnAtPosition.getPlayer() == turn) {

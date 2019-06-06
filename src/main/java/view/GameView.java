@@ -1,6 +1,7 @@
 package view;
 
 import interfaces.Controller;
+import logic.Player;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,12 +16,15 @@ public class GameView extends JPanel {
     private static final String LABEL_CURRENT_TURN = "Current turn: %s";
 
     private BufferedImage backgroundImage;
+    private Controller controller;
+    private DamkaLabel currentTurnLabel;
 
     public GameView(GridBagLayout gridBagLayout, Controller controller) {
         super(gridBagLayout);
+        this.controller = controller;
         try {
             backgroundImage = ImageIO.read(new File(IMAGE_BACKGROUND));
-            createWindowContent(controller);
+            createWindowContent();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -42,12 +46,13 @@ public class GameView extends JPanel {
         add(label, constraints);
     }
 
-    private void createWindowContent(Controller controller) {
+    private void createWindowContent() {
         try {
             addLabel(new ScoreLabel(controller.getPlayer1()), 0, 0);
             addLabel(new ScoreLabel(controller.getPlayer2()), 0, 2);
-            String currentTurnText = String.format(LABEL_CURRENT_TURN, controller.getCurrentTurn().getName());
-            addLabel(new DamkaLabel(currentTurnText), 1, 0);
+            currentTurnLabel = new DamkaLabel("");
+            updateCurrentTurnLabel();
+            addLabel(currentTurnLabel, 1, 0);
             createBoard(controller);
         } catch (IOException e) {
             e.printStackTrace();
@@ -59,7 +64,15 @@ public class GameView extends JPanel {
     @Override
     public void repaint() {
         super.repaint();
+        if (controller != null) {
+            updateCurrentTurnLabel();
+        }
+    }
 
+    private void updateCurrentTurnLabel() {
+        Player currentTurn = controller.getCurrentTurn();
+        currentTurnLabel.setText(String.format(LABEL_CURRENT_TURN, currentTurn.getName()));
+        currentTurnLabel.setForeground(currentTurn.getColor());
     }
 
     @Override
