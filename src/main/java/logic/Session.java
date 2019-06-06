@@ -77,6 +77,12 @@ public class Session implements InputConsumer {
         if(selectedPawn == null) // no pawn selected
             return false;
 
+        if(selectedPawn.getPlayer().toString() == "R") { // reds are going down
+
+        } else {
+
+        }
+
         return false;
     }
 
