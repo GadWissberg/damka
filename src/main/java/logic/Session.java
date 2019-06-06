@@ -31,15 +31,24 @@ public class Session implements Controller {
         if (selectedPawn == null) {
             tryToSelectPawn(row, column);
         } else {
-            //getSelectedPawnLegitActions.
-            board.movePawn(selectedPawn, row, column);
-            board.setSelectedPawn(null);
-            turn = turn == p1 ? p2 : p1;
-            displays.forEach(damkaDisplay -> {
-                damkaDisplay.refreshDisplay();
-                damkaDisplay.setSelectionImageVisibility(false);
-            });
+            ArrayList<Move> moves = canMoveto();
+            if (moves.stream().anyMatch(move -> {
+                BoardPosition destination = move.getDestination();
+                return destination.getRow() == row && destination.getCol() == column;
+            })) {
+                manageMovingPawn(row, column, selectedPawn);
+            }
         }
+    }
+
+    private void manageMovingPawn(int row, int column, Pawn selectedPawn) {
+        board.movePawn(selectedPawn, row, column);
+        board.setSelectedPawn(null);
+        turn = turn == p1 ? p2 : p1;
+        displays.forEach(damkaDisplay -> {
+            damkaDisplay.refreshDisplay();
+            damkaDisplay.setSelectionImageVisibility(false);
+        });
     }
 
     private void tryToSelectPawn(int row, int column) {
@@ -90,7 +99,7 @@ public class Session implements Controller {
     private ArrayList canMoveto() {
         Pawn p;
         p = this.board.getSelectedPawn();
-        if(p == null) // no pawn selected
+        if (p == null) // no pawn selected
             return null;
 
         ArrayList<Move> arr = new ArrayList();
@@ -99,7 +108,7 @@ public class Session implements Controller {
 
         int pCol = pawnPos.getCol();
         int pRow = pawnPos.getRow();
-        if(p.getPlayer() == p1 && pRow+1 <= board.CELLS_IN_ROW) { // logic for player 1
+        if (p.getPlayer() == p1 && pRow + 1 <= board.CELLS_IN_ROW) { // logic for player 1
             if (pCol - 1 >= 0) { // left move in bounds
                 p = board.getPawnAtPosition(pRow + 1, pCol - 1);
                 if (p == null) // no player, move freely
@@ -109,10 +118,10 @@ public class Session implements Controller {
             }
 
             if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
-                p = board.getPawnAtPosition(pRow+1, pCol+1);
-                if(p == null) // move freely
+                p = board.getPawnAtPosition(pRow + 1, pCol + 1);
+                if (p == null) // move freely
                     arr.add(new Move(new BoardPosition(pRow + 1, pCol + 1), Move.MoveType.REGULAR));
-                else if(p.getPlayer() == p2 && pRow+2 <= board.CELLS_IN_ROW && pCol+2 <= board.CELLS_IN_ROW) // can eat
+                else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol + 2 <= board.CELLS_IN_ROW) // can eat
                     arr.add(new Move(new BoardPosition(pRow + 2, pCol + 2), Move.MoveType.EAT));
             }
         } else { // logic for player 2
