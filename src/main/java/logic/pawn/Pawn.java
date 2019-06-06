@@ -18,10 +18,6 @@ public class Pawn {
         return player.getColor() == Color.RED ? "R" : "B";
     }
 
-    public int getId() {
-        return 0;
-    }
-
     public Player getPlayer() {
         return player;
     }
@@ -29,5 +25,8 @@ public class Pawn {
     public BoardPosition getPosition() {
         return position;
     }
-    //TODO: Add setters and getters for row and col. king is bonus for now. remove id.
+
+    public void setPosition(int row, int column) {
+        position.set(row,column);
+    }
 }

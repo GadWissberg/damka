@@ -1,7 +1,7 @@
 package view;
 
-import interfaces.InputConsumer;
-import interfaces.OutputSubscriber;
+import interfaces.Controller;
+import interfaces.DamkaDisplay;
 import logic.Board;
 import logic.pawn.Pawn;
 
@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class BoardView extends JPanel implements OutputSubscriber {
+public class BoardView extends JPanel implements DamkaDisplay {
     private static final String IMAGE_WHITE_CELL_PATH = GameWindow.RSC_FOLDER + "white_cell.png";
     private static final String IMAGE_BLACK_CELL_PATH = GameWindow.RSC_FOLDER + "black_cell.png";
     private static final String IMAGE_BLUE_PAWN_PATH = GameWindow.RSC_FOLDER + "blue.png";
@@ -31,14 +31,14 @@ public class BoardView extends JPanel implements OutputSubscriber {
     private Stroke borderStroke = new BasicStroke(8);
     private SelectionComponent selectionComponent = new SelectionComponent();
 
-    BoardView(InputConsumer inputConsumer, Board board) throws IOException {
+    BoardView(Controller controller, Board board) throws IOException {
         this.board = board;
         initializeImages();
         Dimension size = new Dimension(WIDTH, HEIGHT);
         setPreferredSize(size);
-        addMouseListener(inputConsumer);
-        inputConsumer.setCellSize(whiteCellImage.getWidth(), whiteCellImage.getHeight());
-        inputConsumer.subscribeForOutput(this);
+        addMouseListener(controller);
+        controller.setCellSize(whiteCellImage.getWidth(), whiteCellImage.getHeight());
+        controller.subscribeForOutput(this);
     }
 
     private void initializeImages() throws IOException {
@@ -58,7 +58,7 @@ public class BoardView extends JPanel implements OutputSubscriber {
         gt.setStroke(borderStroke);
         g.drawRect(0, 0, 512, 512);
         if (selectionComponent.visible)
-            g.drawImage(selectionImage, selectionComponent.x, selectionComponent.y, null);
+            g.drawImage(selectionImage, (int) selectionComponent.x, (int) selectionComponent.y, null);
     }
 
     private void drawCellsAndPawns(Graphics g) {
@@ -97,16 +97,27 @@ public class BoardView extends JPanel implements OutputSubscriber {
         repaint();
     }
 
+    @Override
+    public void refreshDisplay() {
+        getParent().repaint();
+        repaint();
+    }
+
+    @Override
+    public void setSelectionImageVisibility(boolean b) {
+        selectionComponent.setVisible(b);
+    }
+
     private class SelectionComponent {
-        private int x;
-        private int y;
+        private double x;
+        private double y;
         private boolean visible;
 
         public SelectionComponent() {
             setVisible(false);
         }
 
-        public void setPosition(int x, int y) {
+        public void setPosition(double x, double y) {
             this.x = x;
             this.y = y;
         }

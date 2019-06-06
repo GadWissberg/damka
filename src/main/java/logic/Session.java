@@ -1,20 +1,20 @@
 package logic;
 
-import interfaces.InputConsumer;
-import interfaces.OutputSubscriber;
+import interfaces.Controller;
+import interfaces.DamkaDisplay;
 import logic.pawn.Pawn;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-public class Session implements InputConsumer {
+public class Session implements Controller {
     private Player p1;
     private Player p2;
     private Board board = new Board();
     private Player turn;
     private Rectangle cellSize = new Rectangle();
-    private ArrayList<OutputSubscriber> subscribersForOutput = new ArrayList<>();
+    private ArrayList<DamkaDisplay> displays = new ArrayList<>();
 
     public void initialize(Player p1, Player p2) {
         this.p1 = p1;
@@ -27,10 +27,29 @@ public class Session implements InputConsumer {
     public void mouseClicked(MouseEvent e) {
         int row = (int) (e.getY() / cellSize.getWidth());
         int column = (int) (e.getX() / cellSize.getHeight());
+        Pawn selectedPawn = board.getSelectedPawn();
+        if (selectedPawn == null) {
+            tryToSelectPawn(row, column);
+        } else {
+            //getSelectedPawnLegitActions.
+            board.movePawn(selectedPawn, row, column);
+            board.setSelectedPawn(null);
+            turn = turn == p1 ? p2 : p1;
+            displays.forEach(damkaDisplay -> {
+                damkaDisplay.refreshDisplay();
+                damkaDisplay.setSelectionImageVisibility(false);
+            });
+        }
+    }
+
+    private void movePawn(int row, int column) {
+    }
+
+    private void tryToSelectPawn(int row, int column) {
         Pawn pawnAtPosition = board.getPawnAtPosition(row, column);
         if (pawnAtPosition != null && pawnAtPosition.getPlayer() == turn) {
             board.setSelectedPawn(pawnAtPosition);
-            subscribersForOutput.forEach(subscriber -> subscriber.setSelectionImage(column * cellSize.getWidth(),
+            displays.forEach(subscriber -> subscriber.setSelectionImage(column * cellSize.getWidth(),
                     row * cellSize.getHeight()));
         }
     }
@@ -71,28 +90,19 @@ public class Session implements InputConsumer {
         return board;
     }
 
-    private ArrayList canMoveto() {
+    private boolean isMovable(int x, int y) {
         Pawn selectedPawn;
         selectedPawn = this.board.getSelectedPawn();
-        if(selectedPawn == null) // no pawn selected
-            return null;
+        if (selectedPawn == null) // no pawn selected
+            return false;
 
-        BoardPosition pawnPos = selectedPawn.getPosition();
-        int r;
-        for(r = pawnPos.getRow(); r < pawnPos.getRow()+2; r++) {
+        if (selectedPawn.getPlayer().toString() == "R") { // reds are going down
+
+        } else {
 
         }
 
-
-
-
-        ArrayList<BoardPosition> arr = new ArrayList();
-
-
-
-        arr.add(new BoardPosition(1,1));
-
-        return arr;
+        return false;
     }
 
     @Override
@@ -101,9 +111,9 @@ public class Session implements InputConsumer {
     }
 
     @Override
-    public void subscribeForOutput(OutputSubscriber subscriber) {
-        if (!subscribersForOutput.contains(subscriber)) {
-            subscribersForOutput.add(subscriber);
+    public void subscribeForOutput(DamkaDisplay subscriber) {
+        if (!displays.contains(subscriber)) {
+            displays.add(subscriber);
         }
     }
 }

@@ -2,8 +2,6 @@ package logic;
 
 import logic.pawn.Pawn;
 
-import java.lang.reflect.Array;
-
 public class Board {
     public static final int CELLS_IN_ROW = 8;
     private Pawn[][] board = new Pawn[CELLS_IN_ROW][CELLS_IN_ROW];
@@ -58,5 +56,12 @@ public class Board {
 
     public void setSelectedPawn(Pawn pawn) {
         selectedPawn = pawn;
+    }
+
+    public void movePawn(Pawn pawn, int row, int column) {
+        BoardPosition position = pawn.getPosition();
+        board[position.getRow()][position.getCol()] = null;
+        board[row][column] = pawn;
+        pawn.setPosition(row, column);
     }
 }
