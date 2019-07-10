@@ -1,4 +1,4 @@
-package logic;
+package model;
 
 public class BoardPosition {
     private int row, col;

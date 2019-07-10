@@ -1,10 +1,7 @@
-import logic.Json;
-import logic.Player;
-import logic.Session;
-import view.GameWindow;
-
-import javax.swing.*;
+import controller.*;
 import java.awt.*;
+import javax.swing.*;
+import view.*;
 
 public class Damka {
     public static void main(String... args) {

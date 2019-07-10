@@ -1,6 +1,6 @@
 package view;
 
-import logic.Player;
+import controller.*;
 
 public class ScoreLabel extends DamkaLabel implements ScoreChangedSubscriber {
     public static final String PLAYER_SCORE = "%s score: %d";

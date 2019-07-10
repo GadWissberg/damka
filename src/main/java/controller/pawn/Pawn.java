@@ -1,9 +1,8 @@
-package logic.pawn;
+package controller.pawn;
 
-import logic.BoardPosition;
-import logic.Player;
-
+import controller.*;
 import java.awt.*;
+import model.*;
 
 public class Pawn {
     private final Player player;

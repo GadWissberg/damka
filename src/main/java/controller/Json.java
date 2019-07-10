@@ -1,13 +1,9 @@
-package logic;
+package controller;
 
 import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
-import logic.pawn.Pawn;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Writer;
+import com.google.gson.stream.*;
+import controller.pawn.*;
+import java.io.*;
 
 public class Json {
     private static final String JSON_FILE = "src"+File.separator+"main"+File.separator+"game.json";

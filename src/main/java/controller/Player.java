@@ -1,9 +1,8 @@
-package logic;
-
-import view.ScoreChangedSubscriber;
+package controller;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
+import view.*;
 
 public class Player {
     private final String name;

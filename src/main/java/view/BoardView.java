@@ -1,16 +1,15 @@
 package view;
 
-import interfaces.Controller;
-import interfaces.DamkaDisplay;
-import logic.Board;
-import logic.pawn.Pawn;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
+import controller.*;
+import controller.pawn.*;
+import interfaces.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.*;
+import java.io.*;
+import java.util.*;
+import javax.imageio.*;
+import javax.swing.*;
+import model.*;
 
 public class BoardView extends JPanel implements DamkaDisplay {
     private static final String IMAGE_WHITE_CELL_PATH = GameWindow.RSC_FOLDER + "white_cell.png";
@@ -21,7 +20,7 @@ public class BoardView extends JPanel implements DamkaDisplay {
     private static final int WIDTH = 512;
     private static final int HEIGHT = 512;
 
-    private final Board board;
+    private final Board board; //TODO: REMOVE THIS FROM HERE!
 
     private BufferedImage whiteCellImage;
     private BufferedImage blackCellImage;
@@ -30,6 +29,7 @@ public class BoardView extends JPanel implements DamkaDisplay {
     private BufferedImage selectionImage;
     private Stroke borderStroke = new BasicStroke(8);
     private SelectionComponent selectionComponent = new SelectionComponent();
+    private ArrayList<SelectionComponent> availableMovesIndicators = new ArrayList<>();
 
     BoardView(Controller controller, Board board) throws IOException {
         this.board = board;
@@ -57,8 +57,13 @@ public class BoardView extends JPanel implements DamkaDisplay {
         g.setColor(Color.BLACK);
         gt.setStroke(borderStroke);
         g.drawRect(0, 0, 512, 512);
+        drawSelectionComponents(g);
+    }
+
+    private void drawSelectionComponents(Graphics g) {
         if (selectionComponent.visible)
-            g.drawImage(selectionImage, (int) selectionComponent.x, (int) selectionComponent.y, null);
+            g.drawImage(selectionImage, (int) selectionComponent.getX(), (int) selectionComponent.getY(), null);
+        availableMovesIndicators.forEach(cell -> g.drawImage(selectionImage, (int) cell.getX(), (int) cell.getY(), null));
     }
 
     private void drawCellsAndPawns(Graphics g) {
@@ -108,18 +113,34 @@ public class BoardView extends JPanel implements DamkaDisplay {
         selectionComponent.setVisible(b);
     }
 
-    private class SelectionComponent {
-        private double x;
-        private double y;
+    @Override
+    public void displayMessage(String text) {
+        JOptionPane.showMessageDialog(null, text);
+    }
+
+    @Override
+    public void setAvailableMovesLocations(ArrayList<BoardPixelLocation> canMoveto) {
+        availableMovesIndicators.clear();
+        if (canMoveto != null) {
+            canMoveto.forEach(location -> {
+                SelectionComponent selectionComponent = new SelectionComponent();
+                selectionComponent.setPosition(location);
+                availableMovesIndicators.add(selectionComponent);
+            });
+            refreshDisplay();
+        }
+    }
+
+    private class SelectionComponent extends BoardPixelLocation {
         private boolean visible;
 
         public SelectionComponent() {
+            super(0, 0);
             setVisible(false);
         }
 
-        public void setPosition(double x, double y) {
-            this.x = x;
-            this.y = y;
+        public void setPosition(BoardPixelLocation position) {
+            super.setPosition(position.getX(), position.getY());
         }
 
         public void setVisible(boolean b) {

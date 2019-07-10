@@ -1,14 +1,14 @@
-package logic;
+package controller;
 
-import interfaces.Controller;
-import interfaces.DamkaDisplay;
-import logic.pawn.Pawn;
-
+import controller.pawn.*;
+import interfaces.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
+import java.awt.event.*;
+import java.util.*;
+import model.*;
 
 public class Session implements Controller {
+    private static final String MSG_ILLEGAL_MOVE = "You cannot move this pawn over there!";
     private Player p1;
     private Player p2;
     private Board board = new Board();
@@ -28,17 +28,27 @@ public class Session implements Controller {
         int row = (int) (e.getY() / cellSize.getWidth());
         int column = (int) (e.getX() / cellSize.getHeight());
         Pawn selectedPawn = board.getSelectedPawn();
-        if (selectedPawn == null) {
-            tryToSelectPawn(row, column);
-        } else {
-            ArrayList<Move> moves = canMoveto();
-            if (moves.stream().anyMatch(move -> {
-                BoardPosition destination = move.getDestination();
-                return destination.getRow() == row && destination.getCol() == column;
-            })) {
-                manageMovingPawn(row, column, selectedPawn);
-            }
-        }
+        Pawn pawnAtPosition = board.getPawnAtPosition(row, column);
+        if (pawnAtPosition != null && (selectedPawn == null || selectedPawn.getPlayer().equals(turn)))
+            tryToSelectPawn(pawnAtPosition);
+        else moveSelectedPawn(row, column, selectedPawn);
+    }
+
+    private void moveSelectedPawn(int row, int column, Pawn selectedPawn) {
+        ArrayList<Move> moves = canMoveto();
+        boolean isMoveLegal = moves != null && moves.stream().anyMatch(move -> {
+            BoardPosition destination = move.getDestination();
+            return destination.getRow() == row && destination.getCol() == column;
+        });
+        if (isMoveLegal) manageMovingPawn(row, column, selectedPawn);
+        else handleIllegalMove();
+    }
+
+    private void handleIllegalMove() {
+        displays.forEach(damkaDisplay -> {
+            damkaDisplay.refreshDisplay();
+            damkaDisplay.displayMessage(MSG_ILLEGAL_MOVE);
+        });
     }
 
     private void manageMovingPawn(int row, int column, Pawn selectedPawn) {
@@ -48,15 +58,34 @@ public class Session implements Controller {
         displays.forEach(damkaDisplay -> {
             damkaDisplay.refreshDisplay();
             damkaDisplay.setSelectionImageVisibility(false);
+            damkaDisplay.setAvailableMovesLocations(null);
         });
     }
 
-    private void tryToSelectPawn(int row, int column) {
-        Pawn pawnAtPosition = board.getPawnAtPosition(row, column);
-        if (pawnAtPosition != null && pawnAtPosition.getPlayer() == turn) {
+    private void tryToSelectPawn(Pawn pawnAtPosition) {
+        if (pawnAtPosition != null && board.getSelectedPawn() != pawnAtPosition && pawnAtPosition.getPlayer() == turn) {
             board.setSelectedPawn(pawnAtPosition);
-            displays.forEach(subscriber -> subscriber.setSelectionImage(column * cellSize.getWidth(),
-                    row * cellSize.getHeight()));
+            displays.forEach(subscriber -> {
+                BoardPosition pawnPosition = pawnAtPosition.getPosition();
+                double x = pawnPosition.getCol() * cellSize.getWidth();
+                double y = pawnPosition.getRow() * cellSize.getHeight();
+                subscriber.setSelectionImage(x, y);
+            });
+            requestToDrawAvailableMoves();
+        }
+    }
+
+    private void requestToDrawAvailableMoves() {
+        ArrayList<Move> availableMoves = canMoveto();
+        if (availableMoves != null) {
+            ArrayList<BoardPixelLocation> boardPixelLocations = new ArrayList<>();
+            availableMoves.forEach(move -> {
+                double x = move.getDestination().getCol() * cellSize.width;
+                double y = move.getDestination().getRow() * cellSize.height;
+                BoardPixelLocation location = new BoardPixelLocation(x, y);
+                boardPixelLocations.add(location);
+            });
+            displays.forEach(subscriber -> subscriber.setAvailableMovesLocations(boardPixelLocations));
         }
     }
 
@@ -96,19 +125,19 @@ public class Session implements Controller {
         return board;
     }
 
-    private ArrayList canMoveto() {
+    private ArrayList<Move> canMoveto() {
         Pawn p;
         p = this.board.getSelectedPawn();
         if (p == null) // no pawn selected
             return null;
 
-        ArrayList<Move> arr = new ArrayList();
+        ArrayList<Move> arr = new ArrayList<>();
         BoardPosition pawnPos = p.getPosition();
         int r, c;
 
         int pCol = pawnPos.getCol();
         int pRow = pawnPos.getRow();
-        if (p.getPlayer() == p1 && pRow + 1 <= board.CELLS_IN_ROW) { // logic for player 1
+        if (p.getPlayer() == p1 && pRow + 1 <= board.CELLS_IN_ROW) { // controller for player 1
             if (pCol - 1 >= 0) { // left move in bounds
                 p = board.getPawnAtPosition(pRow + 1, pCol - 1);
                 if (p == null) // no player, move freely
@@ -124,7 +153,7 @@ public class Session implements Controller {
                 else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol + 2 <= board.CELLS_IN_ROW) // can eat
                     arr.add(new Move(new BoardPosition(pRow + 2, pCol + 2), Move.MoveType.EAT));
             }
-        } else if(pRow-1 >= 0){ // logic for player 2
+        } else if (pRow - 1 >= 0) { // controller for player 2
             if (pCol - 1 >= 0) { // left move in bounds
                 p = board.getPawnAtPosition(pRow - 1, pCol - 1);
                 if (p == null) // no player, move freely
@@ -134,10 +163,10 @@ public class Session implements Controller {
             }
 
             if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
-                p = board.getPawnAtPosition(pRow-1, pCol+1);
-                if(p == null) // move freely
+                p = board.getPawnAtPosition(pRow - 1, pCol + 1);
+                if (p == null) // move freely
                     arr.add(new Move(new BoardPosition(pRow - 1, pCol + 1), Move.MoveType.REGULAR));
-                else if(p.getPlayer() == p1 && pRow-2 >= 0 && pCol+2 <= board.CELLS_IN_ROW) // can eat
+                else if (p.getPlayer() == p1 && pRow - 2 >= 0 && pCol + 2 <= board.CELLS_IN_ROW) // can eat
                     arr.add(new Move(new BoardPosition(pRow - 2, pCol + 2), Move.MoveType.EAT));
             }
         }

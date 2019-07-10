@@ -1,5 +1,5 @@
-import logic.Board;
-import org.junit.Test;
+import controller.*;
+import org.junit.*;
 
 import static org.junit.Assert.*;
 

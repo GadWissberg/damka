@@ -1,4 +1,4 @@
-package logic;
+package model;
 
 public class Move {
     private final BoardPosition destination;

@@ -1,6 +1,7 @@
-package logic;
+package controller;
 
-import logic.pawn.Pawn;
+import controller.pawn.*;
+import model.*;
 
 public class Board {
     public static final int CELLS_IN_ROW = 8;

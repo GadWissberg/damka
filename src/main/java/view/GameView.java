@@ -1,14 +1,12 @@
 package view;
 
-import interfaces.Controller;
-import logic.Player;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
+import controller.*;
+import interfaces.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.*;
+import java.io.*;
+import javax.imageio.*;
+import javax.swing.*;
 
 public class GameView extends JPanel {
     private static final String IMAGE_BACKGROUND = GameWindow.RSC_FOLDER + "background.jpg";
