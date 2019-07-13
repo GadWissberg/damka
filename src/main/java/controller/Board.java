@@ -1,21 +1,27 @@
-package logic;
+package controller;
 
-import logic.pawn.PawnInterface;
-import logic.pawn.PawnTempImpl;
+import controller.pawn.Pawn;
+import model.BoardPosition;
 
 public class Board {
     public static final int CELLS_IN_ROW = 8;
-    private PawnInterface[][] board = new PawnInterface[CELLS_IN_ROW][CELLS_IN_ROW];
+    private Pawn[][] board = new Pawn[CELLS_IN_ROW][CELLS_IN_ROW];
     private int numOfBluePawns = 12;
     private int numOfRedPawns = 12;
+
+    public Pawn getSelectedPawn() {
+        return selectedPawn;
+    }
+
+    private Pawn selectedPawn;
 
     public void fillBoard(Player p1, Player p2) {
         int evenRow = 0;
         for (int i = 0; i < 3; i++) {
             evenRow ^= 1;
             for (int j = 0; j < CELLS_IN_ROW - evenRow; j += 2) {
-                board[i][j + evenRow] = new PawnTempImpl(p1, i, j + evenRow);
-                board[7 - i][j + (evenRow ^ 1)] = new PawnTempImpl(p2, 7 - i, j + (evenRow ^ 1));
+                board[i][j + evenRow] = new Pawn(p1, i, j + evenRow);
+                board[7 - i][j + (evenRow ^ 1)] = new Pawn(p2, 7 - i, j + (evenRow ^ 1));
             }
         }
     }
@@ -45,7 +51,23 @@ public class Board {
         return this.board[row][column] == null;
     }
 
-    public PawnInterface getPawnAtPosition(int row, int column) {
+    public Pawn getPawnAtPosition(int row, int column) {
         return board[row][column];
+    }
+
+    public void setSelectedPawn(Pawn pawn) {
+        selectedPawn = pawn;
+    }
+
+    public void movePawn(Pawn pawn, int row, int column) {
+        BoardPosition position = pawn.getPosition();
+        board[position.getRow()][position.getCol()] = null;
+        board[row][column] = pawn;
+        pawn.setPosition(row, column);
+    }
+
+    public void removePawn(Pawn pawnToEat) {
+        BoardPosition position = pawnToEat.getPosition();
+        board[position.getRow()][position.getCol()] = null;
     }
 }

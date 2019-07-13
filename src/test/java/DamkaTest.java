@@ -1,5 +1,5 @@
-import logic.Board;
-import org.junit.Test;
+import controller.*;
+import org.junit.*;
 
 import static org.junit.Assert.*;
 
@@ -9,7 +9,7 @@ public class DamkaTest {
     @Test()
     public void testBoardClass() {
         Board board = new Board();
-        board.fillBoard(p1, p2);
+//        board.fillBoard(p1, p2);
         board.printBoard();
         assertEquals(board.getNumOfBluePawns(), 12);
         assertEquals(board.getNumOfRedPawns(), 12);

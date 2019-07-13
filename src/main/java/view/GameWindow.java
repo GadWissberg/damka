@@ -1,57 +1,22 @@
 package view;
 
-import logic.Session;
-
-import javax.swing.*;
+import interfaces.*;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import javax.swing.*;
 
 public class GameWindow extends JFrame {
 
-    public static final String RSC_FOLDER = "src"+File.separator+"main"+File.separator+"resources"+File.separator;
-    private static final String MSG_LOAD_UP_FAILURE = "The game has failed to load up!";
+    public static final String RSC_FOLDER = "src" + File.separator + "main" + File.separator + "resources" + File.separator;
     private static final int WINDOW_WIDTH = 1024;
     private static final int WINDOW_HEIGHT = 768;
-    private static final String LABEL_CURRENT_TURN = "Current turn: %s";
 
-    public void initialize(Session session) {
+    public void initialize(Controller controller) {
         setVisible(true);
-        createWindowContent(session);
-        pack();
-    }
-
-    private void createWindowContent(Session session) {
-        GameView gamePanel = new GameView(new GridBagLayout());
+        GameView gamePanel = new GameView(new GridBagLayout(), controller);
         gamePanel.setPreferredSize(new Dimension(WINDOW_WIDTH, WINDOW_HEIGHT));
-        try {
-            addLabel(gamePanel, new ScoreLabel(session.getPlayer1()), 0, 0);
-            addLabel(gamePanel, new ScoreLabel(session.getPlayer2()), 0, 2);
-            String currentTurnText = String.format(LABEL_CURRENT_TURN, session.getCurrentTurn().getName());
-            addLabel(gamePanel, new DamkaLabel(currentTurnText), 1, 0);
-            createBoard(session, gamePanel);
-            add(gamePanel);
-        } catch (IOException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, MSG_LOAD_UP_FAILURE);
-            System.exit(0);
-        }
-    }
-
-    private void createBoard(Session session, JPanel gamePanel) throws IOException {
-        BoardView boardView;
-        boardView = new BoardView(session, session.getBoard());
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 1;
-        constraints.gridy = 1;
-        gamePanel.add(boardView, constraints);
-    }
-
-    private void addLabel(JPanel gamePanel, JLabel label, int gridX, int gridY) {
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = gridX;
-        constraints.gridy = gridY;
-        gamePanel.add(label, constraints);
+        add(gamePanel);
+        pack();
     }
 
 }

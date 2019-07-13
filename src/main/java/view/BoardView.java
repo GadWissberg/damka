@@ -1,38 +1,44 @@
 package view;
 
-import logic.Board;
-import logic.pawn.PawnInterface;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
+import controller.*;
+import controller.pawn.*;
+import interfaces.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.*;
+import java.io.*;
+import java.util.*;
+import javax.imageio.*;
+import javax.swing.*;
+import model.*;
 
-public class BoardView extends JPanel {
+public class BoardView extends JPanel implements DamkaDisplay {
     private static final String IMAGE_WHITE_CELL_PATH = GameWindow.RSC_FOLDER + "white_cell.png";
     private static final String IMAGE_BLACK_CELL_PATH = GameWindow.RSC_FOLDER + "black_cell.png";
     private static final String IMAGE_BLUE_PAWN_PATH = GameWindow.RSC_FOLDER + "blue.png";
     private static final String IMAGE_RED_PAWN_PATH = GameWindow.RSC_FOLDER + "red.png";
+    private static final String IMAGE_SELECTION_PATH = GameWindow.RSC_FOLDER + "selection.png";
     private static final int WIDTH = 512;
     private static final int HEIGHT = 512;
 
-    private final Board board;
+    private final Board board; //TODO: REMOVE THIS FROM HERE!
 
     private BufferedImage whiteCellImage;
     private BufferedImage blackCellImage;
     private BufferedImage bluePawnImage;
     private BufferedImage redPawnImage;
+    private BufferedImage selectionImage;
     private Stroke borderStroke = new BasicStroke(8);
+    private SelectionComponent selectionComponent = new SelectionComponent();
+    private ArrayList<SelectionComponent> availableMovesIndicators = new ArrayList<>();
 
-    BoardView(MouseListener inputConsumer, Board board) throws IOException {
+    BoardView(Controller controller, Board board) throws IOException {
         this.board = board;
         initializeImages();
         Dimension size = new Dimension(WIDTH, HEIGHT);
         setPreferredSize(size);
-        addMouseListener(inputConsumer);
+        addMouseListener(controller);
+        controller.setCellSize(whiteCellImage.getWidth(), whiteCellImage.getHeight());
+        controller.subscribeForOutput(this);
     }
 
     private void initializeImages() throws IOException {
@@ -40,6 +46,7 @@ public class BoardView extends JPanel {
         blackCellImage = ImageIO.read(new File(IMAGE_BLACK_CELL_PATH));
         bluePawnImage = ImageIO.read(new File(IMAGE_BLUE_PAWN_PATH));
         redPawnImage = ImageIO.read(new File(IMAGE_RED_PAWN_PATH));
+        selectionImage = ImageIO.read(new File(IMAGE_SELECTION_PATH));
     }
 
     @Override
@@ -50,6 +57,13 @@ public class BoardView extends JPanel {
         g.setColor(Color.BLACK);
         gt.setStroke(borderStroke);
         g.drawRect(0, 0, 512, 512);
+        drawSelectionComponents(g);
+    }
+
+    private void drawSelectionComponents(Graphics g) {
+        if (selectionComponent.visible)
+            g.drawImage(selectionImage, (int) selectionComponent.getX(), (int) selectionComponent.getY(), null);
+        availableMovesIndicators.forEach(cell -> g.drawImage(selectionImage, (int) cell.getX(), (int) cell.getY(), null));
     }
 
     private void drawCellsAndPawns(Graphics g) {
@@ -64,7 +78,7 @@ public class BoardView extends JPanel {
         int currentCol = i % Board.CELLS_IN_ROW;
         int x = (i % Board.CELLS_IN_ROW) * whiteCellImage.getWidth();
         int y = currentRow * whiteCellImage.getHeight();
-        PawnInterface pawnAtCurrentCell = board.getPawnAtPosition(currentRow, currentCol);
+        Pawn pawnAtCurrentCell = board.getPawnAtPosition(currentRow, currentCol);
         if (pawnAtCurrentCell != null) {
             g.drawImage(pawnAtCurrentCell.getPlayer().getColor() == Color.RED ? redPawnImage : bluePawnImage, x, y, null);
         }
@@ -81,4 +95,56 @@ public class BoardView extends JPanel {
         g.drawImage(cell, x, y, null);
     }
 
+    @Override
+    public void setSelectionImage(double x, double y) {
+        selectionComponent.setPosition(x, y);
+        selectionComponent.setVisible(true);
+        repaint();
+    }
+
+    @Override
+    public void refreshDisplay() {
+        getParent().repaint();
+        repaint();
+    }
+
+    @Override
+    public void setSelectionImageVisibility(boolean b) {
+        selectionComponent.setVisible(b);
+    }
+
+    @Override
+    public void displayMessage(String text) {
+        JOptionPane.showMessageDialog(null, text);
+    }
+
+    @Override
+    public void setAvailableMovesLocations(ArrayList<BoardPixelLocation> canMoveto) {
+        availableMovesIndicators.clear();
+        if (canMoveto != null) {
+            canMoveto.forEach(location -> {
+                SelectionComponent selectionComponent = new SelectionComponent();
+                selectionComponent.setPosition(location);
+                availableMovesIndicators.add(selectionComponent);
+            });
+            refreshDisplay();
+        }
+    }
+
+    private class SelectionComponent extends BoardPixelLocation {
+        private boolean visible;
+
+        public SelectionComponent() {
+            super(0, 0);
+            setVisible(false);
+        }
+
+        public void setPosition(BoardPixelLocation position) {
+            super.setPosition(position.getX(), position.getY());
+        }
+
+        public void setVisible(boolean b) {
+            visible = b;
+        }
+    }
 }

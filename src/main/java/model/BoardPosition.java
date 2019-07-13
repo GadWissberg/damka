@@ -1,4 +1,4 @@
-package logic;
+package model;
 
 public class BoardPosition {
     private int row, col;
@@ -14,5 +14,10 @@ public class BoardPosition {
 
     public int getCol() {
         return col;
+    }
+
+    public void set(int row, int column) {
+        this.row = row;
+        this.col = column;
     }
 }

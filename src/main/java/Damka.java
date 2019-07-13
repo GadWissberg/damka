@@ -1,6 +1,6 @@
-import logic.Json;
-import logic.Player;
-import logic.Session;
+import controller.Json;
+import controller.Player;
+import controller.Session;
 import view.GameWindow;
 
 import javax.swing.*;
@@ -10,8 +10,8 @@ public class Damka {
     public static void main(String... args) {
         Session session = new Session();
         GameWindow display = new GameWindow();
-        Player p1 = new Player("Trump", Color.RED);
-        Player p2 = new Player("Bibi", Color.BLUE);
+        Player p1 = new Player("Trump", Color.RED, Player.Direction.DOWN);
+        Player p2 = new Player("Bibi", Color.BLUE, Player.Direction.UP);
         session.initialize(p1, p2);
         display.initialize(session);
         display.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -19,6 +19,6 @@ public class Damka {
 
         // json test
         Json j = new Json();
-        j.Encode(session);
+        j.getAllSessionData(session);
     }
 }
