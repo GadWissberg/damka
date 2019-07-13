@@ -13,7 +13,7 @@ public class Damka {
         Player p1 = new Player("Trump", Color.RED, Player.Direction.DOWN);
         Player p2 = new Player("Bibi", Color.BLUE, Player.Direction.UP);
         session.initialize(p1, p2);
-        display.initialize(session);
+        display.initialize(session, session);
         display.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         display.setResizable(false);
 

@@ -10,12 +10,14 @@ import model.Move;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Optional;
 
 import static controller.Board.CELLS_IN_ROW;
 
-public class Session implements Controller {
+public class Session implements Controller, PropertyChangeListener {
     private static final String MSG_ILLEGAL_MOVE = "You cannot move this pawn over there!";
     private Player p1;
     private Player p2;
@@ -269,5 +271,11 @@ public class Session implements Controller {
         if (!displays.contains(subscriber)) {
             displays.add(subscriber);
         }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        //TODO restart variables after restart emit
+        System.out.println("session print");
     }
 }

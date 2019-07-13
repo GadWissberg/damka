@@ -3,7 +3,11 @@ package view;
 import controller.*;
 import interfaces.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.*;
 import javax.imageio.*;
 import javax.swing.*;
@@ -15,17 +19,24 @@ public class GameView extends JPanel {
 
     private BufferedImage backgroundImage;
     private Controller controller;
+    PropertyChangeSupport propertyChangeHandler;
     private DamkaLabel currentTurnLabel;
+    private JButton gameRestart;
 
-    public GameView(GridBagLayout gridBagLayout, Controller controller) {
+    public GameView(GridBagLayout gridBagLayout, Controller mouseListener) {
         super(gridBagLayout);
-        this.controller = controller;
+        this.propertyChangeHandler = new PropertyChangeSupport(this);
+        this.controller = mouseListener;
         try {
             backgroundImage = ImageIO.read(new File(IMAGE_BACKGROUND));
             createWindowContent();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeHandler.addPropertyChangeListener(listener);
     }
 
     private void createBoard(Controller controller) throws IOException {
@@ -44,6 +55,13 @@ public class GameView extends JPanel {
         add(label, constraints);
     }
 
+    private void addButton(JButton button, int gridX, int gridY) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = gridX;
+        constraints.gridy = gridY;
+        add(button, constraints);
+    }
+
     private void createWindowContent() {
         try {
             addLabel(new ScoreLabel(controller.getPlayer1()), 0, 0);
@@ -51,12 +69,26 @@ public class GameView extends JPanel {
             currentTurnLabel = new DamkaLabel("");
             updateCurrentTurnLabel();
             addLabel(currentTurnLabel, 1, 0);
+            gameRestart = createRestartButton();
+            addButton(gameRestart, 3, 0);
             createBoard(controller);
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, MSG_LOAD_UP_FAILURE);
             System.exit(0);
         }
+    }
+
+    private JButton createRestartButton() {
+        gameRestart = new JButton("Restart game");
+        gameRestart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //TODO fire the correct property
+                propertyChangeHandler.firePropertyChange("test", false, true);
+            }
+        });
+        return gameRestart;
     }
 
     @Override
@@ -80,4 +112,5 @@ public class GameView extends JPanel {
             g.drawImage(backgroundImage, 0, 0, null);
         }
     }
+
 }
