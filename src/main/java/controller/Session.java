@@ -1,7 +1,6 @@
 package controller;
 
 import controller.pawn.Pawn;
-import controller.Board;
 import interfaces.Controller;
 import interfaces.DamkaDisplay;
 import model.BoardPixelLocation;
@@ -26,6 +25,7 @@ public class Session implements Controller, PropertyChangeListener {
     private Player turn;
     private Rectangle cellSize = new Rectangle();
     private ArrayList<DamkaDisplay> displays = new ArrayList<>();
+    private SoundPlayer player = new SoundPlayer();
 
     public void initialize(Player p1, Player p2) {
         this.p1 = p1;
@@ -41,7 +41,9 @@ public class Session implements Controller, PropertyChangeListener {
         Pawn selectedPawn = board.getSelectedPawn();
         Optional<Pawn> pawnAtPosition = Optional.ofNullable(board.getPawnAtPosition(row, column));
         if (pawnAtPosition.isPresent()) {
-            if (pawnAtPosition.get().getPlayer().equals(turn)) tryToSelectPawn(pawnAtPosition.get());
+            if (pawnAtPosition.get().getPlayer().equals(turn)) {
+                tryToSelectPawn(pawnAtPosition.get());
+            }
         } else if (selectedPawn != null) {
             boolean moved = moveSelectedPawn(row, column, selectedPawn, calculateMovesForPawn(selectedPawn, false));
             if (moved) {
@@ -65,6 +67,7 @@ public class Session implements Controller, PropertyChangeListener {
                 }
                 // increase moves counter
                 selectedPawn.getPlayer().increaseMoves();
+                player.playSound(SoundPlayer.Sound.MOVE);
                 return true;
             } else {
                 handleIllegalMove();
@@ -74,6 +77,7 @@ public class Session implements Controller, PropertyChangeListener {
     }
 
     private void performEat(Pawn selectedPawn, Optional<Move> move) {
+        player.playSound(SoundPlayer.Sound.EAT);
         Pawn pawnToEat = ((EatMove) move.get()).getPawnToEat();
         board.removePawn(pawnToEat);
         if (pawnToEat.getPlayer().getColor().equals(Color.RED)) {
@@ -154,6 +158,7 @@ public class Session implements Controller, PropertyChangeListener {
 
     private void tryToSelectPawn(Pawn pawnAtPosition) {
         if (pawnAtPosition != null && board.getSelectedPawn() != pawnAtPosition && pawnAtPosition.getPlayer() == turn) {
+            player.playSound(SoundPlayer.Sound.CLICK);
             board.setSelectedPawn(pawnAtPosition);
             displays.forEach(subscriber -> {
                 BoardPosition pawnPosition = pawnAtPosition.getPosition();
@@ -180,15 +185,16 @@ public class Session implements Controller, PropertyChangeListener {
     }
 
     private boolean isGameOver() {
-      if( board.getNumOfBluePawns() == 0)
-          return true;
-      if( board.getNumOfRedPawns() == 0)
-          return true;
-      return false;
+        if (board.getNumOfBluePawns() == 0)
+            return true;
+        if (board.getNumOfRedPawns() == 0)
+            return true;
+
+        return false;
     }
 
 
-        @Override
+    @Override
     public void mousePressed(MouseEvent e) {
 //Nothing yet...
     }
