@@ -287,9 +287,11 @@ public class Session implements Controller, PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-        //TODO restart variables after restart emit
-        board.resetBoard(p1, p2);
-        requestToRefreshDisplay();
-        turn = Math.random() > 0.5f ? p1 : p2;
+        if (event.getPropertyName().equals("Restart button")) {
+            board.resetBoard(p1, p2);
+            requestToRefreshDisplay();
+            turn = Math.random() > 0.5f ? p1 : p2;
+        }
+
     }
 }

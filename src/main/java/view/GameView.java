@@ -1,5 +1,6 @@
 package view;
 
+import com.sun.deploy.panel.JavaPanel;
 import controller.*;
 import interfaces.*;
 import java.awt.*;
@@ -19,9 +20,8 @@ public class GameView extends JPanel {
 
     private BufferedImage backgroundImage;
     private Controller controller;
-    PropertyChangeSupport propertyChangeHandler;
+    private PropertyChangeSupport propertyChangeHandler;
     private DamkaLabel currentTurnLabel;
-    private JButton gameRestart;
 
     public GameView(GridBagLayout gridBagLayout, Controller mouseListener) {
         super(gridBagLayout);
@@ -55,11 +55,11 @@ public class GameView extends JPanel {
         add(label, constraints);
     }
 
-    private void addButton(JButton button, int gridX, int gridY) {
+    private void addPanel(JPanel panel, int gridX, int gridY) {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = gridX;
         constraints.gridy = gridY;
-        add(button, constraints);
+        add(panel, constraints);
     }
 
     private void createWindowContent() {
@@ -69,8 +69,8 @@ public class GameView extends JPanel {
             currentTurnLabel = new DamkaLabel("");
             updateCurrentTurnLabel();
             addLabel(currentTurnLabel, 1, 0);
-            gameRestart = createRestartButton();
-            addButton(gameRestart, 3, 0);
+            JPanel buttons = createViewButtons();
+            addPanel(buttons, 3, 0);
             createBoard(controller);
         } catch (IOException e) {
             e.printStackTrace();
@@ -79,13 +79,37 @@ public class GameView extends JPanel {
         }
     }
 
+    private JPanel createViewButtons() {
+        JPanel buttons = new JPanel();
+        buttons.setBackground(new Color(0,0,0,0));
+        buttons.add(createRestartButton());
+        buttons.add(createShowStatButton());
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
+        return buttons;
+    }
+
+    private JButton createShowStatButton() {
+        JButton showGameStat = new JButton("Show games statistics");
+        showGameStat.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleGamesStat();
+            }
+        });
+        return showGameStat;
+    }
+
+    private void toggleGamesStat() {
+        //TODO change this toggle
+        String name = JOptionPane.showInputDialog(this, "need to change this", null);
+    }
+
     private JButton createRestartButton() {
-        gameRestart = new JButton("Restart game");
+        JButton gameRestart = new JButton("Restart game");
         gameRestart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //TODO fire the correct property
-                propertyChangeHandler.firePropertyChange("test", false, true);
+                propertyChangeHandler.firePropertyChange("Restart button", false, true);
             }
         });
         return gameRestart;
