@@ -182,7 +182,6 @@ public class Session implements Controller, PropertyChangeListener {
           return true;
       if( board.getNumOfRedPawns() == 0)
           return true;
-
       return false;
     }
 
@@ -287,6 +286,8 @@ public class Session implements Controller, PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         //TODO restart variables after restart emit
-        System.out.println("session print");
+        board.resetBoard(p1, p2);
+        requestToRefreshDisplay();
+        turn = Math.random() > 0.5f ? p1 : p2;
     }
 }

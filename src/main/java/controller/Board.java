@@ -80,4 +80,9 @@ public class Board {
     public void setNumberOfBluePawns(int value) {
         numOfBluePawns = value;
     }
+
+    public void resetBoard(Player p1, Player p2) {
+        this.board = new Pawn[CELLS_IN_ROW][CELLS_IN_ROW];
+        fillBoard(p1, p2);
+    }
 }
