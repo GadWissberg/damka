@@ -1,19 +1,35 @@
 package controller;
 
+import view.ScoreChangedSubscriber;
+
 import java.awt.*;
-import java.util.*;
-import view.*;
+import java.util.ArrayList;
 
 public class Player {
     private final String name;
     private final Color color;
+    private final Direction direction;
     private int score;
     private ArrayList<ScoreChangedSubscriber> scoreChangedSubscribers = new ArrayList<>();
 
-    public Player(String name, Color color) {
+    public enum Direction {
+        DOWN(1), UP(-1);
+
+        private final int dirValue;
+
+        Direction(int direction) {
+            this.dirValue = direction;
+        }
+
+        public int getDirValue() {
+            return dirValue;
+        }
+
+    }
+    public Player(String name, Color color, Direction dir) {
         this.name = name;
         this.color = color;
-//        this.pawns = new ArrayList<Pawn>; TODO: Waiting for Pawn class.
+        this.direction = dir;
     }
 
     public String getName() {
@@ -41,5 +57,9 @@ public class Player {
 
     public Color getColor() {
         return color;
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 }

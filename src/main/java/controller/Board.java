@@ -1,7 +1,7 @@
 package controller;
 
-import controller.pawn.*;
-import model.*;
+import controller.pawn.Pawn;
+import model.BoardPosition;
 
 public class Board {
     public static final int CELLS_IN_ROW = 8;
@@ -64,5 +64,10 @@ public class Board {
         board[position.getRow()][position.getCol()] = null;
         board[row][column] = pawn;
         pawn.setPosition(row, column);
+    }
+
+    public void removePawn(Pawn pawnToEat) {
+        BoardPosition position = pawnToEat.getPosition();
+        board[position.getRow()][position.getCol()] = null;
     }
 }

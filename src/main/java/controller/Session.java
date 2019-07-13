@@ -1,11 +1,19 @@
 package controller;
 
-import controller.pawn.*;
-import interfaces.*;
+import controller.pawn.Pawn;
+import interfaces.Controller;
+import interfaces.DamkaDisplay;
+import model.BoardPixelLocation;
+import model.BoardPosition;
+import model.EatMove;
+import model.Move;
+
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import model.*;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Optional;
+
+import static controller.Board.CELLS_IN_ROW;
 
 public class Session implements Controller {
     private static final String MSG_ILLEGAL_MOVE = "You cannot move this pawn over there!";
@@ -28,20 +36,63 @@ public class Session implements Controller {
         int row = (int) (e.getY() / cellSize.getWidth());
         int column = (int) (e.getX() / cellSize.getHeight());
         Pawn selectedPawn = board.getSelectedPawn();
-        Pawn pawnAtPosition = board.getPawnAtPosition(row, column);
-        if (pawnAtPosition != null && (selectedPawn == null || selectedPawn.getPlayer().equals(turn)))
-            tryToSelectPawn(pawnAtPosition);
-        else moveSelectedPawn(row, column, selectedPawn);
+        Optional<Pawn> pawnAtPosition = Optional.ofNullable(board.getPawnAtPosition(row, column));
+        if (pawnAtPosition.isPresent()) {
+            if (pawnAtPosition.get().getPlayer().equals(turn)) tryToSelectPawn(pawnAtPosition.get());
+        } else if (selectedPawn != null) moveSelectedPawn(row, column, selectedPawn);
     }
 
     private void moveSelectedPawn(int row, int column, Pawn selectedPawn) {
-        ArrayList<Move> moves = canMoveto();
-        boolean isMoveLegal = moves != null && moves.stream().anyMatch(move -> {
-            BoardPosition destination = move.getDestination();
-            return destination.getRow() == row && destination.getCol() == column;
+        Optional<ArrayList<Move>> moves = Optional.ofNullable(calculateMovesForPawn(selectedPawn));
+        moves.ifPresent(m -> {
+            Optional<Move> move = m.stream().filter(filterTo -> {
+                BoardPosition dst = filterTo.getDestination();
+                return dst.getRow() == row && dst.getCol() == column;
+            }).findFirst();
+            if (move.isPresent()) {
+                manageMovingPawn(row, column, selectedPawn);
+                if (move.get().getType().equals(Move.MoveType.EAT)) {
+                    board.removePawn(((EatMove) move.get()).getPawnToEat());
+                }
+            } else {
+                handleIllegalMove();
+            }
         });
-        if (isMoveLegal) manageMovingPawn(row, column, selectedPawn);
-        else handleIllegalMove();
+    }
+
+    private ArrayList<Move> calculateMovesForPawn(Pawn selectedPawn) {
+        ArrayList<Move> moves = new ArrayList<>();
+        calculateMoveForPawn(selectedPawn, 0, -1).ifPresent(moves::add);
+        calculateMoveForPawn(selectedPawn, CELLS_IN_ROW - 1, 1).ifPresent(moves::add);
+        return moves;
+    }
+
+    private Optional<Move> calculateMoveForPawn(Pawn selectedPawn, int boundary, int horizontalDir) {
+        Optional<Move> moveForPawn = Optional.empty();
+        if (selectedPawn.getPosition().getCol() != boundary) {
+            int dirValue = selectedPawn.getPlayer().getDirection().getDirValue();
+            moveForPawn = Optional.ofNullable(generateMoveForPawn(selectedPawn, horizontalDir));
+        }
+        return moveForPawn;
+    }
+
+    private Move generateMoveForPawn(Pawn selectedPawn, int directionX) {
+        Move result = null;
+        BoardPosition position = selectedPawn.getPosition();
+        int verticalDir = selectedPawn.getPlayer().getDirection().getDirValue();
+        int desiredDstRow = position.getRow() + verticalDir;
+        int desiredDstCol = position.getCol() + directionX;
+        if (!board.spotOnBoardIsFree(desiredDstRow, desiredDstCol)) {
+            Pawn otherPawn = board.getPawnAtPosition(desiredDstRow, desiredDstCol);
+            if (otherPawn.getPlayer().equals(selectedPawn.getPlayer().equals(p1) ? p2 : p1)) {
+                BoardPosition destination = new BoardPosition(desiredDstRow + verticalDir, desiredDstCol + directionX);
+                result = new EatMove(destination, otherPawn);
+            }
+        } else {
+            BoardPosition destination = new BoardPosition(desiredDstRow, desiredDstCol);
+            result = new Move(destination);
+        }
+        return result;
     }
 
     private void handleIllegalMove() {
@@ -76,7 +127,7 @@ public class Session implements Controller {
     }
 
     private void requestToDrawAvailableMoves() {
-        ArrayList<Move> availableMoves = canMoveto();
+        ArrayList<Move> availableMoves = calculateMovesForPawn(board.getSelectedPawn());
         if (availableMoves != null) {
             ArrayList<BoardPixelLocation> boardPixelLocations = new ArrayList<>();
             availableMoves.forEach(move -> {
@@ -125,54 +176,54 @@ public class Session implements Controller {
         return board;
     }
 
-    private ArrayList<Move> canMoveto() {
-        Pawn p;
-        p = this.board.getSelectedPawn();
-        if (p == null) // no pawn selected
-            return null;
-
-        ArrayList<Move> arr = new ArrayList<>();
-        BoardPosition pawnPos = p.getPosition();
-        int r, c;
-
-        int pCol = pawnPos.getCol();
-        int pRow = pawnPos.getRow();
-        if (p.getPlayer() == p1 && pRow + 1 <= board.CELLS_IN_ROW) { // controller for player 1
-            if (pCol - 1 >= 0) { // left move in bounds
-                p = board.getPawnAtPosition(pRow + 1, pCol - 1);
-                if (p == null) // no player, move freely
-                    arr.add(new Move(new BoardPosition(pRow + 1, pCol - 1), Move.MoveType.REGULAR));
-                else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol - 2 >= 0) // can eat
-                    arr.add(new Move(new BoardPosition(pRow + 2, pCol - 2), Move.MoveType.EAT));
-            }
-
-            if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
-                p = board.getPawnAtPosition(pRow + 1, pCol + 1);
-                if (p == null) // move freely
-                    arr.add(new Move(new BoardPosition(pRow + 1, pCol + 1), Move.MoveType.REGULAR));
-                else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol + 2 <= board.CELLS_IN_ROW) // can eat
-                    arr.add(new Move(new BoardPosition(pRow + 2, pCol + 2), Move.MoveType.EAT));
-            }
-        } else if (pRow - 1 >= 0) { // controller for player 2
-            if (pCol - 1 >= 0) { // left move in bounds
-                p = board.getPawnAtPosition(pRow - 1, pCol - 1);
-                if (p == null) // no player, move freely
-                    arr.add(new Move(new BoardPosition(pRow - 1, pCol - 1), Move.MoveType.REGULAR));
-                else if (p.getPlayer() == p1 && pRow - 2 >= 0 && pCol - 2 >= 0) // can eat
-                    arr.add(new Move(new BoardPosition(pRow - 2, pCol - 2), Move.MoveType.EAT));
-            }
-
-            if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
-                p = board.getPawnAtPosition(pRow - 1, pCol + 1);
-                if (p == null) // move freely
-                    arr.add(new Move(new BoardPosition(pRow - 1, pCol + 1), Move.MoveType.REGULAR));
-                else if (p.getPlayer() == p1 && pRow - 2 >= 0 && pCol + 2 <= board.CELLS_IN_ROW) // can eat
-                    arr.add(new Move(new BoardPosition(pRow - 2, pCol + 2), Move.MoveType.EAT));
-            }
-        }
-
-        return arr;
-    }
+//    private ArrayList<Move> canMoveTo() {
+//        Pawn p;
+//        p = this.board.getSelectedPawn();
+//        if (p == null) // no pawn selected
+//            return null;
+//
+//        ArrayList<Move> arr = new ArrayList<>();
+//        BoardPosition pawnPos = p.getPosition();
+//        int r, c;
+//
+//        int pCol = pawnPos.getCol();
+//        int pRow = pawnPos.getRow();
+//        if (p.getPlayer() == p1 && pRow + 1 <= board.CELLS_IN_ROW) { // controller for player 1
+//            if (pCol - 1 >= 0) { // left move in bounds
+//                p = board.getPawnAtPosition(pRow + 1, pCol - 1);
+//                if (p == null) // no player, move freely
+//                    arr.add(new Move(new BoardPosition(pRow + 1, pCol - 1), Move.MoveType.REGULAR));
+//                else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol - 2 >= 0) // can eat
+//                    arr.add(new Move(new BoardPosition(pRow + 2, pCol - 2), Move.MoveType.EAT));
+//            }
+//
+//            if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
+//                p = board.getPawnAtPosition(pRow + 1, pCol + 1);
+//                if (p == null) // move freely
+//                    arr.add(new Move(new BoardPosition(pRow + 1, pCol + 1), Move.MoveType.REGULAR));
+//                else if (p.getPlayer() == p2 && pRow + 2 <= board.CELLS_IN_ROW && pCol + 2 <= board.CELLS_IN_ROW) // can eat
+//                    arr.add(new Move(new BoardPosition(pRow + 2, pCol + 2), Move.MoveType.EAT));
+//            }
+//        } else if (pRow - 1 >= 0) { // controller for player 2
+//            if (pCol - 1 >= 0) { // left move in bounds
+//                p = board.getPawnAtPosition(pRow - 1, pCol - 1);
+//                if (p == null) // no player, move freely
+//                    arr.add(new Move(new BoardPosition(pRow - 1, pCol - 1), Move.MoveType.REGULAR));
+//                else if (p.getPlayer() == p1 && pRow - 2 >= 0 && pCol - 2 >= 0) // can eat
+//                    arr.add(new Move(new BoardPosition(pRow - 2, pCol - 2), Move.MoveType.EAT));
+//            }
+//
+//            if (pCol + 1 <= board.CELLS_IN_ROW) { // right move in bounds
+//                p = board.getPawnAtPosition(pRow - 1, pCol + 1);
+//                if (p == null) // move freely
+//                    arr.add(new Move(new BoardPosition(pRow - 1, pCol + 1), Move.MoveType.REGULAR));
+//                else if (p.getPlayer() == p1 && pRow - 2 >= 0 && pCol + 2 <= board.CELLS_IN_ROW) // can eat
+//                    arr.add(new Move(new BoardPosition(pRow - 2, pCol + 2), Move.MoveType.EAT));
+//            }
+//        }
+//
+//        return arr;
+//    }
 
     @Override
     public void setCellSize(int width, int height) {

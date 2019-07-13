@@ -2,13 +2,12 @@ package model;
 
 public class Move {
     private final BoardPosition destination;
-    private final MoveType type;
+    MoveType type = MoveType.REGULAR;
 
     public enum MoveType {REGULAR, EAT}
 
-    public Move(BoardPosition destination, MoveType type) {
+    public Move(BoardPosition destination) {
         this.destination = destination;
-        this.type = type;
     }
 
     public BoardPosition getDestination() {
