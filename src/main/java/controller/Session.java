@@ -39,64 +39,87 @@ public class Session implements Controller {
         Optional<Pawn> pawnAtPosition = Optional.ofNullable(board.getPawnAtPosition(row, column));
         if (pawnAtPosition.isPresent()) {
             if (pawnAtPosition.get().getPlayer().equals(turn)) tryToSelectPawn(pawnAtPosition.get());
-        } else if (selectedPawn != null) moveSelectedPawn(row, column, selectedPawn);
+        } else if (selectedPawn != null) {
+            boolean moved = moveSelectedPawn(row, column, selectedPawn, calculateMovesForPawn(selectedPawn, false));
+            if (moved) {
+                turn = turn == p1 ? p2 : p1;
+                requestToRefreshDisplay();
+            }
+        }
     }
 
-    private void moveSelectedPawn(int row, int column, Pawn selectedPawn) {
-        Optional<ArrayList<Move>> moves = Optional.ofNullable(calculateMovesForPawn(selectedPawn));
-        moves.ifPresent(m -> {
-            Optional<Move> move = m.stream().filter(filterTo -> {
+    private boolean moveSelectedPawn(int row, int column, Pawn selectedPawn, ArrayList<Move> availableMoves) {
+        Optional<ArrayList<Move>> moves = Optional.ofNullable(availableMoves);
+        if (moves.isPresent()) {
+            Optional<Move> move = moves.get().stream().filter(filterTo -> {
                 BoardPosition dst = filterTo.getDestination();
                 return dst.getRow() == row && dst.getCol() == column;
             }).findFirst();
             if (move.isPresent()) {
                 manageMovingPawn(row, column, selectedPawn);
                 if (move.get().getType().equals(Move.MoveType.EAT)) {
-                    Pawn pawnToEat = ((EatMove) move.get()).getPawnToEat();
-                    board.removePawn(pawnToEat);
-                    if (pawnToEat.getPlayer().getColor().equals(Color.RED)) {
-                        board.setNumberOfRedPawns(board.getNumOfRedPawns() - 1);
-                    } else {
-                        board.setNumberOfBluePawns(board.getNumOfBluePawns() - 1);
-                    }
+                    performEat(selectedPawn, move);
                 }
+                return true;
             } else {
                 handleIllegalMove();
             }
-        });
+        }
+        return false;
+    }
+
+    private void performEat(Pawn selectedPawn, Optional<Move> move) {
+        Pawn pawnToEat = ((EatMove) move.get()).getPawnToEat();
+        board.removePawn(pawnToEat);
+        if (pawnToEat.getPlayer().getColor().equals(Color.RED)) {
+            board.setNumberOfRedPawns(board.getNumOfRedPawns() - 1);
+        } else {
+            board.setNumberOfBluePawns(board.getNumOfBluePawns() - 1);
+        }
+        ArrayList<Move> eatMoves = calculateMovesForPawn(selectedPawn, true);
+        if (!eatMoves.isEmpty()) {
+            BoardPosition destination = eatMoves.get(0).getDestination();
+            moveSelectedPawn(destination.getRow(), destination.getCol(), selectedPawn, eatMoves);
+        }
     }
 
     private ArrayList<Move> calculateMovesForPawn(Pawn selectedPawn) {
+        return calculateMovesForPawn(selectedPawn, false);
+    }
+
+    private ArrayList<Move> calculateMovesForPawn(Pawn selectedPawn, boolean eatOnly) {
         ArrayList<Move> moves = new ArrayList<>();
-        calculateMoveForPawn(selectedPawn, 0, -1).ifPresent(moves::add);
-        calculateMoveForPawn(selectedPawn, CELLS_IN_ROW - 1, 1).ifPresent(moves::add);
+        calculateMoveForPawn(selectedPawn, 0, -1, eatOnly, selectedPawn.getPlayer().getDirection().getDirValue()).ifPresent(moves::add);
+        calculateMoveForPawn(selectedPawn, CELLS_IN_ROW - 1, 1, eatOnly, selectedPawn.getPlayer().getDirection().getDirValue()).ifPresent(moves::add);
+        if (eatOnly) {
+            calculateMoveForPawn(selectedPawn, 0, -1, true, -1 * selectedPawn.getPlayer().getDirection().getDirValue()).ifPresent(moves::add);
+            calculateMoveForPawn(selectedPawn, CELLS_IN_ROW - 1, 1, true, -1 * selectedPawn.getPlayer().getDirection().getDirValue()).ifPresent(moves::add);
+        }
         return moves;
     }
 
-    private Optional<Move> calculateMoveForPawn(Pawn selectedPawn, int boundary, int horizontalDir) {
+    private Optional<Move> calculateMoveForPawn(Pawn selectedPawn, int boundary, int horizontalDir, boolean eatOnly, int verticalDir) {
         Optional<Move> moveForPawn = Optional.empty();
         if (selectedPawn.getPosition().getCol() != boundary) {
-            int dirValue = selectedPawn.getPlayer().getDirection().getDirValue();
-            moveForPawn = Optional.ofNullable(generateMoveForPawn(selectedPawn, horizontalDir));
+            moveForPawn = Optional.ofNullable(generateMoveForPawn(selectedPawn, horizontalDir, eatOnly, verticalDir));
         }
         return moveForPawn;
     }
 
-    private Move generateMoveForPawn(Pawn selectedPawn, int directionX) {
+    private Move generateMoveForPawn(Pawn selectedPawn, int directionX, boolean eatOnly, int verticalDir) {
         Move result = null;
         BoardPosition position = selectedPawn.getPosition();
-        int verticalDir = selectedPawn.getPlayer().getDirection().getDirValue();
         int desiredDstRow = position.getRow() + verticalDir;
         int desiredDstCol = position.getCol() + directionX;
         if (!board.spotOnBoardIsFree(desiredDstRow, desiredDstCol)) {
-            Pawn otherPawn = board.getPawnAtPosition(desiredDstRow, desiredDstCol);
-            if (otherPawn.getPlayer().equals(selectedPawn.getPlayer().equals(p1) ? p2 : p1)) {
+            Optional<Pawn> otherPawn = Optional.ofNullable(board.getPawnAtPosition(desiredDstRow, desiredDstCol));
+            if (otherPawn.isPresent() && otherPawn.get().getPlayer().equals(selectedPawn.getPlayer().equals(p1) ? p2 : p1)) {
                 if (board.spotOnBoardIsFree(desiredDstRow + verticalDir, desiredDstCol + directionX)) {
                     BoardPosition destination = new BoardPosition(desiredDstRow + verticalDir, desiredDstCol + directionX);
-                    result = new EatMove(destination, otherPawn);
+                    result = new EatMove(destination, otherPawn.get());
                 }
             }
-        } else {
+        } else if (!eatOnly) {
             BoardPosition destination = new BoardPosition(desiredDstRow, desiredDstCol);
             result = new Move(destination);
         }
@@ -113,7 +136,10 @@ public class Session implements Controller {
     private void manageMovingPawn(int row, int column, Pawn selectedPawn) {
         board.movePawn(selectedPawn, row, column);
         board.setSelectedPawn(null);
-        turn = turn == p1 ? p2 : p1;
+        requestToRefreshDisplay();
+    }
+
+    private void requestToRefreshDisplay() {
         displays.forEach(damkaDisplay -> {
             damkaDisplay.refreshDisplay();
             damkaDisplay.setSelectionImageVisibility(false);

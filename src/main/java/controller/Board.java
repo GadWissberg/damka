@@ -48,10 +48,12 @@ public class Board {
     }
 
     public boolean spotOnBoardIsFree(int row, int column) {
+        if (row < 0 || row >= CELLS_IN_ROW || column < 0 || column >= CELLS_IN_ROW) return false;
         return this.board[row][column] == null;
     }
 
     public Pawn getPawnAtPosition(int row, int column) {
+        if (row < 0 || row >= CELLS_IN_ROW || column < 0 || column >= CELLS_IN_ROW) return null;
         return board[row][column];
     }
 
