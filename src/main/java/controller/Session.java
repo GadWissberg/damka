@@ -63,6 +63,8 @@ public class Session implements Controller, PropertyChangeListener {
                 if (move.get().getType().equals(Move.MoveType.EAT)) {
                     performEat(selectedPawn, move);
                 }
+                // increase moves counter
+                selectedPawn.getPlayer().increaseMoves();
                 return true;
             } else {
                 handleIllegalMove();
