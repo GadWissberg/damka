@@ -85,8 +85,10 @@ public class Session implements Controller {
         if (!board.spotOnBoardIsFree(desiredDstRow, desiredDstCol)) {
             Pawn otherPawn = board.getPawnAtPosition(desiredDstRow, desiredDstCol);
             if (otherPawn.getPlayer().equals(selectedPawn.getPlayer().equals(p1) ? p2 : p1)) {
-                BoardPosition destination = new BoardPosition(desiredDstRow + verticalDir, desiredDstCol + directionX);
-                result = new EatMove(destination, otherPawn);
+                if (board.spotOnBoardIsFree(desiredDstRow + verticalDir, desiredDstCol + directionX)) {
+                    BoardPosition destination = new BoardPosition(desiredDstRow + verticalDir, desiredDstCol + directionX);
+                    result = new EatMove(destination, otherPawn);
+                }
             }
         } else {
             BoardPosition destination = new BoardPosition(desiredDstRow, desiredDstCol);
