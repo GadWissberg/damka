@@ -22,5 +22,5 @@ public class SoundPlayer {
         }
     }
 
-    public enum Sound {CLICK, EAT, MOVE}
+    public enum Sound {CLICK, EAT, MOVE, QUEEN}
 }

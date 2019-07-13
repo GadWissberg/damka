@@ -1,12 +1,13 @@
-package controller.pawn;
+package model;
 
-import controller.*;
+import controller.Player;
+
 import java.awt.*;
-import model.*;
 
 public class Pawn {
     private final Player player;
     private final BoardPosition position;
+    private boolean queen;
 
     public Pawn(Player player, int row, int column) {
         this.player = player;
@@ -26,6 +27,14 @@ public class Pawn {
     }
 
     public void setPosition(int row, int column) {
-        position.set(row,column);
+        position.set(row, column);
+    }
+
+    public void setQueen(boolean b) {
+        queen = b;
+    }
+
+    public boolean isQueen() {
+        return queen;
     }
 }

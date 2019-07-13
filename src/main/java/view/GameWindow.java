@@ -1,10 +1,11 @@
 package view;
 
-import interfaces.*;
+import interfaces.ViewListener;
+
+import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
-import java.io.*;
-import javax.swing.*;
+import java.io.File;
 
 public class GameWindow extends JFrame {
 
@@ -12,7 +13,7 @@ public class GameWindow extends JFrame {
     private static final int WINDOW_WIDTH = 1024;
     private static final int WINDOW_HEIGHT = 768;
 
-    public void initialize(Controller mouseListener, PropertyChangeListener listener) {
+    public void initialize(ViewListener mouseListener, PropertyChangeListener listener) {
         setVisible(true);
         GameView gamePanel = new GameView(new GridBagLayout(), mouseListener);
         gamePanel.addPropertyChangeListener(listener);

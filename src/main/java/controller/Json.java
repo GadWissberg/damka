@@ -1,9 +1,16 @@
 package controller;
 
-import com.google.gson.*;
-import com.google.gson.stream.*;
-import controller.pawn.*;
-import java.io.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
+import model.Pawn;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.Writer;
 
 public class Json {
     private static final String JSON_FILE = "src"+File.separator+"main"+File.separator+"game.json";

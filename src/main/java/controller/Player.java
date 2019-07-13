@@ -53,7 +53,9 @@ public class Player {
         return score;
     }
 
-    public int getMoves() { return moves; }
+    public int getMoves() {
+        return moves;
+    }
 
     public void increaseMoves() {
         moves++;

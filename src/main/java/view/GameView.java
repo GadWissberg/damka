@@ -1,17 +1,18 @@
 package view;
 
-import com.sun.deploy.panel.JavaPanel;
-import controller.*;
-import interfaces.*;
+import controller.Player;
+import interfaces.ViewListener;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.*;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.*;
-import javax.imageio.*;
-import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 
 public class GameView extends JPanel {
     private static final String IMAGE_BACKGROUND = GameWindow.RSC_FOLDER + "background.jpg";
@@ -19,14 +20,14 @@ public class GameView extends JPanel {
     private static final String LABEL_CURRENT_TURN = "Current turn: %s";
 
     private BufferedImage backgroundImage;
-    private Controller controller;
+    private ViewListener viewListener;
     private PropertyChangeSupport propertyChangeHandler;
     private DamkaLabel currentTurnLabel;
 
-    public GameView(GridBagLayout gridBagLayout, Controller mouseListener) {
+    public GameView(GridBagLayout gridBagLayout, ViewListener mouseListener) {
         super(gridBagLayout);
         this.propertyChangeHandler = new PropertyChangeSupport(this);
-        this.controller = mouseListener;
+        this.viewListener = mouseListener;
         try {
             backgroundImage = ImageIO.read(new File(IMAGE_BACKGROUND));
             createWindowContent();
@@ -39,9 +40,9 @@ public class GameView extends JPanel {
         propertyChangeHandler.addPropertyChangeListener(listener);
     }
 
-    private void createBoard(Controller controller) throws IOException {
+    private void createBoard(ViewListener viewListener) throws IOException {
         BoardView boardView;
-        boardView = new BoardView(controller, controller.getBoard());
+        boardView = new BoardView(viewListener, viewListener.getBoard());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 1;
         constraints.gridy = 1;
@@ -64,14 +65,14 @@ public class GameView extends JPanel {
 
     private void createWindowContent() {
         try {
-            addLabel(new ScoreLabel(controller.getPlayer1()), 0, 0);
-            addLabel(new ScoreLabel(controller.getPlayer2()), 0, 2);
+            addLabel(new ScoreLabel(viewListener.getPlayer1()), 0, 0);
+            addLabel(new ScoreLabel(viewListener.getPlayer2()), 0, 2);
             currentTurnLabel = new DamkaLabel("");
             updateCurrentTurnLabel();
             addLabel(currentTurnLabel, 1, 0);
             JPanel buttons = createViewButtons();
             addPanel(buttons, 3, 0);
-            createBoard(controller);
+            createBoard(viewListener);
         } catch (IOException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, MSG_LOAD_UP_FAILURE);
@@ -118,13 +119,13 @@ public class GameView extends JPanel {
     @Override
     public void repaint() {
         super.repaint();
-        if (controller != null) {
+        if (viewListener != null) {
             updateCurrentTurnLabel();
         }
     }
 
     private void updateCurrentTurnLabel() {
-        Player currentTurn = controller.getCurrentTurn();
+        Player currentTurn = viewListener.getCurrentTurn();
         currentTurnLabel.setText(String.format(LABEL_CURRENT_TURN, currentTurn.getName()));
         currentTurnLabel.setForeground(currentTurn.getColor());
     }

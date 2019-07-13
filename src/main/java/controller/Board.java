@@ -1,7 +1,7 @@
 package controller;
 
-import controller.pawn.Pawn;
 import model.BoardPosition;
+import model.Pawn;
 
 public class Board {
     public static final int CELLS_IN_ROW = 8;

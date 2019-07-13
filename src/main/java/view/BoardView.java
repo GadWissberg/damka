@@ -1,21 +1,25 @@
 package view;
 
-import controller.*;
-import controller.pawn.*;
-import interfaces.*;
-import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
-import javax.imageio.*;
+import controller.Board;
+import interfaces.DamkaDisplay;
+import interfaces.ViewListener;
+import model.BoardPixelLocation;
+import model.Pawn;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
-import model.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class BoardView extends JPanel implements DamkaDisplay {
     private static final String IMAGE_WHITE_CELL_PATH = GameWindow.RSC_FOLDER + "white_cell.png";
     private static final String IMAGE_BLACK_CELL_PATH = GameWindow.RSC_FOLDER + "black_cell.png";
     private static final String IMAGE_BLUE_PAWN_PATH = GameWindow.RSC_FOLDER + "blue.png";
     private static final String IMAGE_RED_PAWN_PATH = GameWindow.RSC_FOLDER + "red.png";
+    private static final String IMAGE_QUEEN_PATH = GameWindow.RSC_FOLDER + "queen.png";
     private static final String IMAGE_SELECTION_PATH = GameWindow.RSC_FOLDER + "selection.png";
     private static final int WIDTH = 512;
     private static final int HEIGHT = 512;
@@ -24,6 +28,7 @@ public class BoardView extends JPanel implements DamkaDisplay {
 
     private BufferedImage whiteCellImage;
     private BufferedImage blackCellImage;
+    private BufferedImage queenImage;
     private BufferedImage bluePawnImage;
     private BufferedImage redPawnImage;
     private BufferedImage selectionImage;
@@ -31,14 +36,14 @@ public class BoardView extends JPanel implements DamkaDisplay {
     private SelectionComponent selectionComponent = new SelectionComponent();
     private ArrayList<SelectionComponent> availableMovesIndicators = new ArrayList<>();
 
-    BoardView(Controller controller, Board board) throws IOException {
+    BoardView(ViewListener viewListener, Board board) throws IOException {
         this.board = board;
         initializeImages();
         Dimension size = new Dimension(WIDTH, HEIGHT);
         setPreferredSize(size);
-        addMouseListener(controller);
-        controller.setCellSize(whiteCellImage.getWidth(), whiteCellImage.getHeight());
-        controller.subscribeForOutput(this);
+        addMouseListener(viewListener);
+        viewListener.setCellSize(whiteCellImage.getWidth(), whiteCellImage.getHeight());
+        viewListener.subscribeForOutput(this);
     }
 
     private void initializeImages() throws IOException {
@@ -46,6 +51,7 @@ public class BoardView extends JPanel implements DamkaDisplay {
         blackCellImage = ImageIO.read(new File(IMAGE_BLACK_CELL_PATH));
         bluePawnImage = ImageIO.read(new File(IMAGE_BLUE_PAWN_PATH));
         redPawnImage = ImageIO.read(new File(IMAGE_RED_PAWN_PATH));
+        queenImage = ImageIO.read(new File(IMAGE_QUEEN_PATH));
         selectionImage = ImageIO.read(new File(IMAGE_SELECTION_PATH));
     }
 
@@ -81,6 +87,9 @@ public class BoardView extends JPanel implements DamkaDisplay {
         Pawn pawnAtCurrentCell = board.getPawnAtPosition(currentRow, currentCol);
         if (pawnAtCurrentCell != null) {
             g.drawImage(pawnAtCurrentCell.getPlayer().getColor() == Color.RED ? redPawnImage : bluePawnImage, x, y, null);
+            if (pawnAtCurrentCell.isQueen()) {
+                g.drawImage(queenImage, x, y, null);
+            }
         }
     }
 

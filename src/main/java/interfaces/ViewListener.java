@@ -1,9 +1,11 @@
 package interfaces;
 
-import controller.*;
-import java.awt.event.*;
+import controller.Board;
+import controller.Player;
 
-public interface Controller extends MouseListener {
+import java.awt.event.MouseListener;
+
+public interface ViewListener extends MouseListener {
     void setCellSize(int width, int height);
 
     void subscribeForOutput(DamkaDisplay subscriber);

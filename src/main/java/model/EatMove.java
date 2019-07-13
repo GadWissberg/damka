@@ -1,7 +1,5 @@
 package model;
 
-import controller.pawn.Pawn;
-
 public class EatMove extends Move {
     private final Pawn pawnToEat;
 
