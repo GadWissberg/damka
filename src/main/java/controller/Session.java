@@ -52,7 +52,13 @@ public class Session implements Controller {
             if (move.isPresent()) {
                 manageMovingPawn(row, column, selectedPawn);
                 if (move.get().getType().equals(Move.MoveType.EAT)) {
-                    board.removePawn(((EatMove) move.get()).getPawnToEat());
+                    Pawn pawnToEat = ((EatMove) move.get()).getPawnToEat();
+                    board.removePawn(pawnToEat);
+                    if (pawnToEat.getPlayer().getColor().equals(Color.RED)) {
+                        board.setNumberOfRedPawns(board.getNumOfRedPawns() - 1);
+                    } else {
+                        board.setNumberOfBluePawns(board.getNumOfBluePawns() - 1);
+                    }
                 }
             } else {
                 handleIllegalMove();

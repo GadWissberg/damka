@@ -70,4 +70,12 @@ public class Board {
         BoardPosition position = pawnToEat.getPosition();
         board[position.getRow()][position.getCol()] = null;
     }
+
+    public void setNumberOfRedPawns(int value) {
+        numOfRedPawns = value;
+    }
+
+    public void setNumberOfBluePawns(int value) {
+        numOfBluePawns = value;
+    }
 }
