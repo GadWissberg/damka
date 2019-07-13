@@ -182,6 +182,8 @@ public class Session implements Controller, PropertyChangeListener {
           return true;
       if( board.getNumOfRedPawns() == 0)
           return true;
+
+      return false;
     }
 
 
