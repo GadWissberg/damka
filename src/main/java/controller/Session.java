@@ -1,6 +1,7 @@
 package controller;
 
 import controller.pawn.Pawn;
+import controller.Board;
 import interfaces.Controller;
 import interfaces.DamkaDisplay;
 import model.BoardPixelLocation;
@@ -174,7 +175,15 @@ public class Session implements Controller {
         }
     }
 
-    @Override
+    private boolean isGameOver() {
+      if( board.getNumOfBluePawns() == 0)
+          return true;
+      if( board.getNumOfRedPawns() == 0)
+          return true;
+    }
+
+
+        @Override
     public void mousePressed(MouseEvent e) {
 //Nothing yet...
     }
