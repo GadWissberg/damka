@@ -11,6 +11,7 @@ public class Player {
     private final Direction direction;
     private int score;
     private ArrayList<ScoreChangedSubscriber> scoreChangedSubscribers = new ArrayList<>();
+    private int moves;
 
     public enum Direction {
         DOWN(1), UP(-1);
@@ -26,6 +27,7 @@ public class Player {
         }
 
     }
+
     public Player(String name, Color color, Direction dir) {
         this.name = name;
         this.color = color;
@@ -49,6 +51,12 @@ public class Player {
 
     public int getScore() {
         return score;
+    }
+
+    public int getMoves() { return moves; }
+
+    public void increaseMoves() {
+        moves++;
     }
 
     public void subscribeForScoreChange(ScoreChangedSubscriber subscriber) {
