@@ -34,7 +34,7 @@ public class Session implements ViewListener, PropertyChangeListener {
         this.p2 = p2;
         turn = Math.random() > 0.5f ? p1 : p2;
         board.fillBoard(p1, p2);
-        this.ourJsonClass = new Json();
+        this.ourJsonClass = new JsonHandler();
         updatePreviousGamesWon();
     }
 
@@ -109,7 +109,11 @@ public class Session implements ViewListener, PropertyChangeListener {
             displays.forEach(damkaDisplay -> {
                 damkaDisplay.refreshDisplay();
                 damkaDisplay.displayMessage(String.format(MSG_WIN, selectedPawn.getPlayer().getName()));
-                ourJsonClass.saveSessionData(this);
+                try {
+                    ourJsonClass.saveSessionData(this);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             });
             restartSession();
         }
