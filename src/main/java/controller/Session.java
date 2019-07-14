@@ -23,12 +23,27 @@ public class Session implements ViewListener, PropertyChangeListener {
     private Rectangle cellSize = new Rectangle();
     private ArrayList<DamkaDisplay> displays = new ArrayList<>();
     private SoundPlayer soundPlayer = new SoundPlayer();
+    private Json ourJsonClass;
+    private int gamesWonOne, gamesWonTwo;
 
     public void initialize(Player p1, Player p2) {
         this.p1 = p1;
         this.p2 = p2;
         turn = Math.random() > 0.5f ? p1 : p2;
         board.fillBoard(p1, p2);
+        this.ourJsonClass = new Json();
+        updatePreviousGamesWon();
+    }
+
+    private void updatePreviousGamesWon() {
+        //TODO add a read from json file to games won before if not found write 0
+        if (false) {
+
+        }
+        else {
+            this.gamesWonOne = 0;
+            this.gamesWonTwo = 0;
+        }
     }
 
     @Override
@@ -91,6 +106,7 @@ public class Session implements ViewListener, PropertyChangeListener {
             displays.forEach(damkaDisplay -> {
                 damkaDisplay.refreshDisplay();
                 damkaDisplay.displayMessage(String.format(MSG_WIN, selectedPawn.getPlayer().getName()));
+                ourJsonClass.saveSessionData(this);
             });
             restartSession();
         }
@@ -254,6 +270,14 @@ public class Session implements ViewListener, PropertyChangeListener {
         return board;
     }
 
+    public int getGamesWonOne() {
+        return gamesWonOne;
+    }
+
+    public int getGamesWonTwo() {
+        return gamesWonTwo;
+    }
+
     @Override
     public void setCellSize(int width, int height) {
         cellSize.setSize(width, height);
@@ -277,6 +301,8 @@ public class Session implements ViewListener, PropertyChangeListener {
     private void restartSession() {
         board.resetBoard(p1, p2);
         requestToRefreshDisplay();
+
+
         turn = Math.random() > 0.5f ? p1 : p2;
     }
 }

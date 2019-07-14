@@ -16,5 +16,9 @@ public interface ViewListener extends MouseListener {
 
     Player getCurrentTurn();
 
+    int getGamesWonOne();
+
+    int getGamesWonTwo();
+
     Board getBoard();
 }

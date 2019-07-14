@@ -94,15 +94,15 @@ public class GameView extends JPanel {
         showGameStat.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                toggleGamesStat();
+                popGamesStat();
             }
         });
         return showGameStat;
     }
 
-    private void toggleGamesStat() {
-        //TODO change this toggle
-        String name = JOptionPane.showInputDialog(this, "need to change this", null);
+    private void popGamesStat() {
+        statisticsView statView = new statisticsView(viewListener);
+        statView.setVisible(true);
     }
 
     private JButton createRestartButton() {
@@ -111,6 +111,7 @@ public class GameView extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 propertyChangeHandler.firePropertyChange("Restart button", false, true);
+                updateCurrentTurnLabel();
             }
         });
         return gameRestart;

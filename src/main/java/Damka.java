@@ -1,3 +1,4 @@
+import com.google.gson.stream.JsonReader;
 import controller.Json;
 import controller.Player;
 import controller.Session;
@@ -17,8 +18,5 @@ public class Damka {
         display.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         display.setResizable(false);
 
-        // json test
-        Json j = new Json();
-        j.getAllSessionData(session);
     }
 }

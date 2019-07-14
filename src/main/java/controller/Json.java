@@ -16,7 +16,7 @@ public class Json {
     private static final String JSON_FILE = "src"+File.separator+"main"+File.separator+"game.json";
 
     // Encode game session to Json
-    public void getAllSessionData(Session s) {
+    public void saveSessionData(Session s) {
         Gson js = new Gson();
         JsonArray arr = new JsonArray();
 
@@ -79,15 +79,10 @@ public class Json {
         o.add("board", o2);
         arr.add(o);
 
-        // TODO: delete before release
-        System.out.println(js.toJson((arr)));
-
-        //return js;
         save2File(js);
     }
 
     private void save2File(Gson json) {
-        // output json to file
         try (Writer writer = new FileWriter(JSON_FILE)) {
             Gson gson = new GsonBuilder().create();
             gson.toJson(json, writer);
@@ -96,14 +91,16 @@ public class Json {
         }
     }
 
-    // convert json (from file) to array
-    public void Decode() {
+    // convert json need to make this work
+    public JsonReader decodeToReader() {
         try {
             Gson gson = new Gson();
             JsonReader reader = new JsonReader(new FileReader(JSON_FILE));
-            //Response data = gson.fromJson(reader);
+            return reader;
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
+        return null;
     }
+
 }
