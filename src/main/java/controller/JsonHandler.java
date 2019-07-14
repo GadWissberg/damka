@@ -7,21 +7,18 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import model.Pawn;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.Writer;
+import java.io.*;
 
-public class Json {
-    private static final String JSON_FILE = "src"+File.separator+"main"+File.separator+"game.json";
+public class JsonHandler {
+    private static final String JSON_FILE = "src" + File.separator + "main" + File.separator + "game.json";
 
     // Encode game session to Json
-    public void saveSessionData(Session s) {
+    public void saveSessionData(Session s) throws IOException{
         Gson js = new Gson();
         JsonArray arr = new JsonArray();
 
         // create objects for later use
-        JsonObject o  = new JsonObject();
+        JsonObject o = new JsonObject();
         JsonObject o2 = new JsonObject();
 
         Player p1, p2;
@@ -59,10 +56,10 @@ public class Json {
         String pawns[][] = new String[size][size];
 
         String color;
-        for(i = 0; i < size; i++) {
+        for (i = 0; i < size; i++) {
             for (j = 0; j < size; j++) {
                 pawn = board.getPawnAtPosition(i, j);
-                if(pawn == null)
+                if (pawn == null)
                     color = "";
                 else
                     color = pawn.toString();
@@ -82,12 +79,14 @@ public class Json {
         save2File(js);
     }
 
-    private void save2File(Gson json) {
+    private void save2File(Gson json) throws IOException {
+        // output json to file
         try (Writer writer = new FileWriter(JSON_FILE)) {
             Gson gson = new GsonBuilder().create();
             gson.toJson(json, writer);
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
+            throw e;
         }
     }
 
