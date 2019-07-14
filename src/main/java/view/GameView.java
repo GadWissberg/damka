@@ -82,11 +82,18 @@ public class GameView extends JPanel {
 
     private JPanel createViewButtons() {
         JPanel buttons = new JPanel();
-        buttons.setBackground(new Color(0,0,0,0));
+        buttons.setBackground(new Color(0, 0, 0, 0));
         buttons.add(createRestartButton());
         buttons.add(createShowStatButton());
+        buttons.add(createSaveGameButton());
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
         return buttons;
+    }
+
+    private JButton createSaveGameButton() {
+        JButton showGameStat = new JButton("Save Game");
+        showGameStat.addActionListener(e -> propertyChangeHandler.firePropertyChange("Save Game", false, true));
+        return showGameStat;
     }
 
     private JButton createShowStatButton() {

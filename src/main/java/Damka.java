@@ -1,4 +1,3 @@
-import controller.Json;
 import controller.Player;
 import controller.Session;
 import view.GameWindow;
@@ -16,9 +15,5 @@ public class Damka {
         display.initialize(session, session);
         display.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         display.setResizable(false);
-
-        // json test
-        Json j = new Json();
-        j.getAllSessionData(session);
     }
 }

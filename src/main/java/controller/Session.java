@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -16,6 +17,8 @@ import static controller.Board.CELLS_IN_ROW;
 public class Session implements ViewListener, PropertyChangeListener {
     private static final String MSG_ILLEGAL_MOVE = "You cannot move this pawn over there!";
     private static final String MSG_WIN = "%s wins!";
+    private static final String MSG_FAILED_TO_SAVE = "Failed to save!";
+    private static final String MSG_SAVED = "Game saved!";
     private Player p1;
     private Player p2;
     private Board board = new Board();
@@ -23,6 +26,7 @@ public class Session implements ViewListener, PropertyChangeListener {
     private Rectangle cellSize = new Rectangle();
     private ArrayList<DamkaDisplay> displays = new ArrayList<>();
     private SoundPlayer soundPlayer = new SoundPlayer();
+    private JsonHandler jsonHandler = new JsonHandler();
 
     public void initialize(Player p1, Player p2) {
         this.p1 = p1;
@@ -270,6 +274,20 @@ public class Session implements ViewListener, PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent event) {
         if (event.getPropertyName().equals("Restart button")) {
             restartSession();
+        } else if (event.getPropertyName().equals("Save Game")) {
+            try {
+                jsonHandler.getAllSessionData(this);
+                displays.forEach(damkaDisplay -> {
+                    damkaDisplay.refreshDisplay();
+                    damkaDisplay.displayMessage(MSG_SAVED);
+                });
+            } catch (IOException e) {
+                displays.forEach(damkaDisplay -> {
+                    damkaDisplay.refreshDisplay();
+                    damkaDisplay.displayMessage(MSG_FAILED_TO_SAVE);
+                });
+                e.printStackTrace();
+            }
         }
 
     }
