@@ -1,16 +1,12 @@
 package controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.*;
 import model.Pawn;
 
 import java.io.*;
 
 public class JsonHandler {
-    private static final String JSON_FILE = "src" + File.separator + "main" + File.separator + "game.json";
+    private static final String JSON_FILE_PATH = "src" + File.separator + "main" + File.separator + "game.json";
 
     // Encode game session to Json
     public void saveSessionData(Session s) throws IOException{
@@ -18,33 +14,34 @@ public class JsonHandler {
         JsonArray arr = new JsonArray();
 
         // create objects for later use
-        JsonObject o = new JsonObject();
-        JsonObject o2 = new JsonObject();
+        JsonObject layout = new JsonObject();
+        JsonObject scoresObject = new JsonObject();
+        JsonObject player1Object = new JsonObject();
+        JsonObject player2Object = new JsonObject();
+        JsonObject extraInfo = new JsonObject();
+
 
         Player p1, p2;
         p1 = s.getPlayer1();
         p2 = s.getPlayer2();
 
+        // Total scores
+        scoresObject.addProperty("player1", 0);
+        scoresObject.addProperty("player2", 0);
+        layout.add("totalScore", scoresObject);
+
         // Player 1
-        o.addProperty("name", p1.getName());
-        o.addProperty("color", p1.toString());
-        o.addProperty("score", p1.getScore());
-        o2.add("player1", o);
-        arr.add(o2);
+        player1Object.addProperty("name", p1.getName());
+        player1Object.addProperty("color", p1.toString());
+        player1Object.addProperty("score", p1.getScore());
+        layout.add("player1", player1Object);
 
         // Player 2
-        o = new JsonObject();
-        o2 = new JsonObject();
-        o.addProperty("name", p2.getName());
-        o.addProperty("color", p2.toString());
-        o.addProperty("score", p2.getScore());
-        o2.add("player2", o);
-        arr.add(o2);
-
-        // current turn
-        o = new JsonObject();
-
-        arr.add(o);
+        player2Object.addProperty("name", p2.getName());
+        player2Object.addProperty("color", p2.toString());
+        player2Object.addProperty("score", p2.getScore());
+        layout.add("player2", player2Object);
+        arr.add(layout);
 
         // board status
         int size = Board.CELLS_IN_ROW; // board size
@@ -68,20 +65,19 @@ public class JsonHandler {
             }
         }
 
-        o = new JsonObject();
-        o2 = new JsonObject();
-        o2.addProperty("size", size);
-        o2.addProperty("pawns", js.toJson(pawns));
-        o2.addProperty("turn", s.getCurrentTurn().toString());
-        o.add("board", o2);
-        arr.add(o);
+        // Extra info
+        extraInfo.addProperty("size", size);
+        extraInfo.addProperty("pawns", js.toJson(pawns));
+        extraInfo.addProperty("turn", s.getCurrentTurn().toString());
+        layout.add("board", extraInfo);
+        arr.add(layout);
 
-        save2File(js);
+        save2File(arr);
     }
 
-    private void save2File(Gson json) throws IOException {
+    private void save2File(JsonArray json) throws IOException {
         // output json to file
-        try (Writer writer = new FileWriter(JSON_FILE)) {
+        try (Writer writer = new FileWriter(JSON_FILE_PATH)) {
             Gson gson = new GsonBuilder().create();
             gson.toJson(json, writer);
         } catch (Exception e) {
@@ -90,16 +86,21 @@ public class JsonHandler {
         }
     }
 
-    // convert json need to make this work
-    public JsonReader decodeToReader() {
-        try {
-            Gson gson = new Gson();
-            JsonReader reader = new JsonReader(new FileReader(JSON_FILE));
-            return reader;
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
+    public int getScoreOne() throws FileNotFoundException {
+        JsonObject totalScoresObject = getTotalScoresJson();
+        return totalScoresObject.get("player1").getAsInt();
     }
 
+    public int getScoreTwo() throws FileNotFoundException {
+        JsonObject totalScoresObject = getTotalScoresJson();
+        return totalScoresObject.get("player2").getAsInt();
+    }
+
+    private JsonObject getTotalScoresJson() throws FileNotFoundException {
+        Gson gson = new Gson();
+        BufferedReader br = new BufferedReader(new FileReader(JSON_FILE_PATH));
+        JsonArray fullString = gson.fromJson(br, JsonArray.class);
+        JsonObject fullObject = fullString.get(0).getAsJsonObject();
+        return fullObject.get("totalScore").getAsJsonObject();
+    }
 }

@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ public class Session implements ViewListener, PropertyChangeListener {
     private Rectangle cellSize = new Rectangle();
     private ArrayList<DamkaDisplay> displays = new ArrayList<>();
     private SoundPlayer soundPlayer = new SoundPlayer();
-    private JsonHandler ourJsonClass;
+    private JsonHandler jsonHandler;
     private int gamesWonOne, gamesWonTwo;
 
     public void initialize(Player p1, Player p2) {
@@ -34,16 +34,15 @@ public class Session implements ViewListener, PropertyChangeListener {
         this.p2 = p2;
         turn = Math.random() > 0.5f ? p1 : p2;
         board.fillBoard(p1, p2);
-        this.ourJsonClass = new JsonHandler();
+        jsonHandler = new JsonHandler();
         updatePreviousGamesWon();
     }
 
     private void updatePreviousGamesWon() {
-        //TODO add a read from json file to games won before if not found write 0
-        if (false) {
-
-        }
-        else {
+        try {
+            this.gamesWonOne = jsonHandler.getScoreOne();
+            this.gamesWonTwo = jsonHandler.getScoreTwo();
+        } catch (FileNotFoundException e) {
             this.gamesWonOne = 0;
             this.gamesWonTwo = 0;
         }
@@ -108,15 +107,30 @@ public class Session implements ViewListener, PropertyChangeListener {
         if (isGameOver()) {
             displays.forEach(damkaDisplay -> {
                 damkaDisplay.refreshDisplay();
+                updateTotalGamesScore(selectedPawn.getPlayer().getName());
                 damkaDisplay.displayMessage(String.format(MSG_WIN, selectedPawn.getPlayer().getName()));
                 try {
-                    ourJsonClass.saveSessionData(this);
+                    jsonHandler.saveSessionData(this);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
-            restartSession();
+            try {
+                jsonHandler.saveSessionData(this);
+                restartSession();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
+    }
+
+    private void updateTotalGamesScore(String name) {
+        if(name.equals(p1.getName()))
+            gamesWonOne++;
+        else
+            gamesWonTwo++;
+
     }
 
     private ArrayList<Move> calculateMovesForPawn(Pawn selectedPawn) {
@@ -302,8 +316,15 @@ public class Session implements ViewListener, PropertyChangeListener {
         if (event.getPropertyName().equals("Restart button")) {
             restartSession();
         } else if (event.getPropertyName().equals("Save Game")) {
-            // NEED TO CHECK WITH GAD
-            //JsonHandler.getAllSession(this);
+            try {
+                jsonHandler.saveSessionData(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+                displays.forEach(damkaDisplay -> {
+                    damkaDisplay.refreshDisplay();
+                    damkaDisplay.displayMessage(MSG_FAILED_TO_SAVE);
+                });
+            }
             displays.forEach(damkaDisplay -> {
                 damkaDisplay.refreshDisplay();
                 damkaDisplay.displayMessage(MSG_SAVED);

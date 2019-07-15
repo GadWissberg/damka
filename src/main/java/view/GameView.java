@@ -108,7 +108,7 @@ public class GameView extends JPanel {
     }
 
     private void popGamesStat() {
-        statisticsView statView = new statisticsView(viewListener);
+        StatisticsView statView = new StatisticsView(viewListener);
         statView.setVisible(true);
     }
 
