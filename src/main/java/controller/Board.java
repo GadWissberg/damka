@@ -26,19 +26,6 @@ public class Board {
         }
     }
 
-    // This method will be unnecessary once the game board completes
-    public void printBoard() {
-        for (int i = 0; i < CELLS_IN_ROW; i++) {
-            for (int j = 0; j < CELLS_IN_ROW; j++) {
-                if (board[i][j] == null)
-                    System.out.print(" " + " ");
-                else
-                    System.out.print(board[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
     public int getNumOfBluePawns() {
         return numOfBluePawns;
     }
