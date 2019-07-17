@@ -8,7 +8,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -126,7 +127,7 @@ public class Session implements ViewListener, PropertyChangeListener {
     }
 
     private void updateTotalGamesScore(String name) {
-        if(name.equals(p1.getName()))
+        if (name.equals(p1.getName()))
             gamesWonOne++;
         else
             gamesWonTwo++;
@@ -197,16 +198,21 @@ public class Session implements ViewListener, PropertyChangeListener {
         });
     }
 
-    private void manageMovingPawn(int row, int column, Pawn selectedPawn) {
+    private void manageMovingPawn(int destinationRow, int destinationColumn, Pawn selectedPawn) {
+        makeQueenIfNeeded(destinationRow, selectedPawn);
+        board.movePawn(selectedPawn, destinationRow, destinationColumn);
+        board.setSelectedPawn(null);
+        requestToRefreshDisplay();
+    }
+
+    private void makeQueenIfNeeded(int destinationRow, Pawn selectedPawn) {
         Player.Direction direction = selectedPawn.getPlayer().getDirection();
-        if ((direction.equals(Player.Direction.DOWN) && row == CELLS_IN_ROW - 1)
-                || (direction.equals(Player.Direction.UP) && row == 0)) {
+        boolean ifRedReachedBottom = direction.equals(Player.Direction.DOWN) && destinationRow == CELLS_IN_ROW - 1;
+        boolean ifBlueReachedTop = direction.equals(Player.Direction.UP) && destinationRow == 0;
+        if (!selectedPawn.isQueen() && (ifRedReachedBottom || ifBlueReachedTop)) {
             selectedPawn.setQueen(true);
             soundPlayer.playSound(SoundPlayer.Sound.QUEEN);
         }
-        board.movePawn(selectedPawn, row, column);
-        board.setSelectedPawn(null);
-        requestToRefreshDisplay();
     }
 
     private void requestToRefreshDisplay() {
