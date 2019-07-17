@@ -13,36 +13,19 @@ public class Player {
     private ArrayList<ScoreChangedSubscriber> scoreChangedSubscribers = new ArrayList<>();
     private int moves;
 
-    public enum Direction {
-        DOWN(1), UP(-1);
-
-        private final int dirValue;
-
-        Direction(int direction) {
-            this.dirValue = direction;
-        }
-
-        public int getDirValue() {
-            return dirValue;
-        }
-
-    }
-
     public Player(String name, Color color, Direction dir) {
         this.name = name;
         this.color = color;
         this.direction = dir;
     }
 
-    public String getName() {
-        return name;
+    public void reset() {
+        setScore(0);
+        moves = 0;
     }
 
-    public void setScore(int score) {
-        if (score != this.score) {
-            this.score = score;
-            scoreChangedSubscribers.forEach(sub -> sub.scoreChanged(score));
-        }
+    public String getName() {
+        return name;
     }
 
     public String toString() {
@@ -51,6 +34,13 @@ public class Player {
 
     public int getScore() {
         return score;
+    }
+
+    public void setScore(int score) {
+        if (score != this.score) {
+            this.score = score;
+            scoreChangedSubscribers.forEach(sub -> sub.scoreChanged(score));
+        }
     }
 
     public int getMoves() {
@@ -71,5 +61,20 @@ public class Player {
 
     public Direction getDirection() {
         return direction;
+    }
+
+    public enum Direction {
+        DOWN(1), UP(-1);
+
+        private final int dirValue;
+
+        Direction(int direction) {
+            this.dirValue = direction;
+        }
+
+        public int getDirValue() {
+            return dirValue;
+        }
+
     }
 }

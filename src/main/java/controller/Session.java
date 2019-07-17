@@ -25,7 +25,7 @@ public class Session implements ViewListener, PropertyChangeListener {
     private Board board = new Board();
     private Player turn;
     private Rectangle cellSize = new Rectangle();
-    private ArrayList<DamkaDisplay> displays = new ArrayList<>();
+    private ArrayList<DamkaDisplay> listeners = new ArrayList<>();
     private SoundPlayer soundPlayer = new SoundPlayer();
     private JsonHandler jsonHandler;
     private int gamesWonOne, gamesWonTwo;
@@ -95,6 +95,8 @@ public class Session implements ViewListener, PropertyChangeListener {
         soundPlayer.playSound(SoundPlayer.Sound.EAT);
         Pawn pawnToEat = ((EatMove) move.get()).getPawnToEat();
         board.removePawn(pawnToEat);
+        Player player = selectedPawn.getPlayer();
+        player.setScore(player.getScore() + 1);
         if (pawnToEat.getPlayer().getColor().equals(Color.RED)) {
             board.setNumberOfRedPawns(board.getNumOfRedPawns() - 1);
         } else {
@@ -106,10 +108,10 @@ public class Session implements ViewListener, PropertyChangeListener {
             moveSelectedPawn(destination.getRow(), destination.getCol(), selectedPawn, eatMoves);
         }
         if (isGameOver()) {
-            displays.forEach(damkaDisplay -> {
+            listeners.forEach(damkaDisplay -> {
                 damkaDisplay.refreshDisplay();
-                updateTotalGamesScore(selectedPawn.getPlayer().getName());
-                damkaDisplay.displayMessage(String.format(MSG_WIN, selectedPawn.getPlayer().getName()));
+                updateTotalGamesScore(player.getName());
+                damkaDisplay.displayMessage(String.format(MSG_WIN, player.getName()));
                 try {
                     jsonHandler.saveSessionData(this);
                 } catch (IOException e) {
@@ -192,7 +194,7 @@ public class Session implements ViewListener, PropertyChangeListener {
     }
 
     private void handleIllegalMove() {
-        displays.forEach(damkaDisplay -> {
+        listeners.forEach(damkaDisplay -> {
             damkaDisplay.refreshDisplay();
             damkaDisplay.displayMessage(MSG_ILLEGAL_MOVE);
         });
@@ -216,7 +218,7 @@ public class Session implements ViewListener, PropertyChangeListener {
     }
 
     private void requestToRefreshDisplay() {
-        displays.forEach(damkaDisplay -> {
+        listeners.forEach(damkaDisplay -> {
             damkaDisplay.refreshDisplay();
             damkaDisplay.setSelectionImageVisibility(false);
             damkaDisplay.setAvailableMovesLocations(null);
@@ -227,7 +229,7 @@ public class Session implements ViewListener, PropertyChangeListener {
         if (pawnAtPosition != null && board.getSelectedPawn() != pawnAtPosition && pawnAtPosition.getPlayer() == turn) {
             soundPlayer.playSound(SoundPlayer.Sound.CLICK);
             board.setSelectedPawn(pawnAtPosition);
-            displays.forEach(subscriber -> {
+            listeners.forEach(subscriber -> {
                 BoardPosition pawnPosition = pawnAtPosition.getPosition();
                 double x = pawnPosition.getCol() * cellSize.getWidth();
                 double y = pawnPosition.getRow() * cellSize.getHeight();
@@ -247,7 +249,7 @@ public class Session implements ViewListener, PropertyChangeListener {
                 BoardPixelLocation location = new BoardPixelLocation(x, y);
                 boardPixelLocations.add(location);
             });
-            displays.forEach(subscriber -> subscriber.setAvailableMovesLocations(boardPixelLocations));
+            listeners.forEach(subscriber -> subscriber.setAvailableMovesLocations(boardPixelLocations));
         }
     }
 
@@ -312,8 +314,8 @@ public class Session implements ViewListener, PropertyChangeListener {
 
     @Override
     public void subscribeForOutput(DamkaDisplay subscriber) {
-        if (!displays.contains(subscriber)) {
-            displays.add(subscriber);
+        if (!listeners.contains(subscriber)) {
+            listeners.add(subscriber);
         }
     }
 
@@ -326,12 +328,12 @@ public class Session implements ViewListener, PropertyChangeListener {
                 jsonHandler.saveSessionData(this);
             } catch (IOException e) {
                 e.printStackTrace();
-                displays.forEach(damkaDisplay -> {
+                listeners.forEach(damkaDisplay -> {
                     damkaDisplay.refreshDisplay();
                     damkaDisplay.displayMessage(MSG_FAILED_TO_SAVE);
                 });
             }
-            displays.forEach(damkaDisplay -> {
+            listeners.forEach(damkaDisplay -> {
                 damkaDisplay.refreshDisplay();
                 damkaDisplay.displayMessage(MSG_SAVED);
             });
@@ -340,6 +342,8 @@ public class Session implements ViewListener, PropertyChangeListener {
     }
 
     private void restartSession() {
+        p1.reset();
+        p2.reset();
         board.resetBoard(p1, p2);
         requestToRefreshDisplay();
         turn = Math.random() > 0.5f ? p1 : p2;
