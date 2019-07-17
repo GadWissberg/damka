@@ -24,7 +24,7 @@ public class BoardView extends JPanel implements DamkaDisplay {
     private static final int WIDTH = 512;
     private static final int HEIGHT = 512;
 
-    private final Board board; //TODO: REMOVE THIS FROM HERE!
+    private final Board board;
 
     private BufferedImage whiteCellImage;
     private BufferedImage blackCellImage;
@@ -143,16 +143,16 @@ public class BoardView extends JPanel implements DamkaDisplay {
     private class SelectionComponent extends BoardPixelLocation {
         private boolean visible;
 
-        public SelectionComponent() {
+        private SelectionComponent() {
             super(0, 0);
             setVisible(false);
         }
 
-        public void setPosition(BoardPixelLocation position) {
+        private void setPosition(BoardPixelLocation position) {
             super.setPosition(position.getX(), position.getY());
         }
 
-        public void setVisible(boolean b) {
+        private void setVisible(boolean b) {
             visible = b;
         }
     }

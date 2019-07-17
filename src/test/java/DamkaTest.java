@@ -1,4 +1,3 @@
-import com.google.gson.JsonObject;
 import controller.*;
 import org.junit.*;
 
@@ -42,12 +41,8 @@ public class DamkaTest {
 
     @Test()
     public void testPlayerName() {
-        assertFalse("Player 1 name is empty", p1.getName().equals(""));
-        assertFalse("Player 2 name is empty", p2.getName().equals(""));
+        assertNotEquals("Player 1 name is empty", "", p1.getName());
+        assertNotEquals("Player 2 name is empty", "", p2.getName());
     }
-
-
-
-
 
 }
