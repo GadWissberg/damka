@@ -60,7 +60,7 @@ public class Session implements ViewListener, PropertyChangeListener {
                 tryToSelectPawn(pawnAtPosition.get());
             }
         } else if (selectedPawn != null) {
-            boolean moved = moveSelectedPawn(row, column, selectedPawn, calculateMovesForPawn(selectedPawn, false));
+            boolean moved = tryToMovePawn(row, column, selectedPawn, calculateMovesForPawn(selectedPawn, false));
             if (moved) {
                 turn = turn == p1 ? p2 : p1;
                 requestToRefreshDisplay();
@@ -68,7 +68,7 @@ public class Session implements ViewListener, PropertyChangeListener {
         }
     }
 
-    private boolean moveSelectedPawn(int row, int column, Pawn selectedPawn, ArrayList<Move> availableMoves) {
+    private boolean tryToMovePawn(int row, int column, Pawn selectedPawn, ArrayList<Move> availableMoves) {
         Optional<ArrayList<Move>> moves = Optional.ofNullable(availableMoves);
         if (moves.isPresent()) {
             Optional<Move> move = moves.get().stream().filter(filterTo -> {
@@ -80,7 +80,6 @@ public class Session implements ViewListener, PropertyChangeListener {
                 if (move.get().getType().equals(Move.MoveType.EAT)) {
                     performEat(selectedPawn, move);
                 }
-                // increase moves counter
                 selectedPawn.getPlayer().increaseMoves();
                 soundPlayer.playSound(SoundPlayer.Sound.MOVE);
                 return true;
@@ -105,7 +104,7 @@ public class Session implements ViewListener, PropertyChangeListener {
         ArrayList<Move> eatMoves = calculateMovesForPawn(selectedPawn, true);
         if (!eatMoves.isEmpty()) {
             BoardPosition destination = eatMoves.get(0).getDestination();
-            moveSelectedPawn(destination.getRow(), destination.getCol(), selectedPawn, eatMoves);
+            tryToMovePawn(destination.getRow(), destination.getCol(), selectedPawn, eatMoves);
         }
         if (isGameOver()) {
             listeners.forEach(damkaDisplay -> {
@@ -143,11 +142,12 @@ public class Session implements ViewListener, PropertyChangeListener {
     private ArrayList<Move> calculateMovesForPawn(Pawn selectedPawn, boolean eatOnly) {
         ArrayList<Move> moves = new ArrayList<>();
         int verticalDir = selectedPawn.getPlayer().getDirection().getDirValue();
-        calculateRoadForPawn(selectedPawn, eatOnly, moves, verticalDir, selectedPawn.isQueen() ? Integer.MAX_VALUE : 1, -1);
-        calculateRoadForPawn(selectedPawn, eatOnly, moves, verticalDir, selectedPawn.isQueen() ? Integer.MAX_VALUE : 1, 1);
+        int maxSteps = selectedPawn.isQueen() ? Integer.MAX_VALUE : 1;
+        calculateRoadForPawn(selectedPawn, eatOnly, moves, verticalDir, maxSteps, -1);
+        calculateRoadForPawn(selectedPawn, eatOnly, moves, verticalDir, maxSteps, 1);
         if (eatOnly || selectedPawn.isQueen()) {
-            calculateRoadForPawn(selectedPawn, eatOnly, moves, -1 * verticalDir, Integer.MAX_VALUE, -1);
-            calculateRoadForPawn(selectedPawn, eatOnly, moves, -1 * verticalDir, Integer.MAX_VALUE, 1);
+            calculateRoadForPawn(selectedPawn, eatOnly, moves, -1 * verticalDir, maxSteps, -1);
+            calculateRoadForPawn(selectedPawn, eatOnly, moves, -1 * verticalDir, maxSteps, 1);
         }
         return moves;
     }
