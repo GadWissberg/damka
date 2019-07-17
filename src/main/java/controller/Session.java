@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class Session implements ViewListener, PropertyChangeListener {
     private static final String MSG_WIN = "%s wins!";
     private static final String MSG_FAILED_TO_SAVE = "Failed to save!";
     private static final String MSG_SAVED = "Game saved!";
+    private static final String MSG_FAILED_TO_LOAD = "Failed to load game!";
     private Player p1;
     private Player p2;
     private Board board = new Board();
@@ -194,10 +196,7 @@ public class Session implements ViewListener, PropertyChangeListener {
     }
 
     private void handleIllegalMove() {
-        listeners.forEach(damkaDisplay -> {
-            damkaDisplay.refreshDisplay();
-            damkaDisplay.displayMessage(MSG_ILLEGAL_MOVE);
-        });
+        requestToDisplayMessage(MSG_ILLEGAL_MOVE);
     }
 
     private void manageMovingPawn(int destinationRow, int destinationColumn, Pawn selectedPawn) {
@@ -324,21 +323,37 @@ public class Session implements ViewListener, PropertyChangeListener {
         if (event.getPropertyName().equals("Restart button")) {
             restartSession();
         } else if (event.getPropertyName().equals("Save Game")) {
+            saveGame();
+        } else if (event.getPropertyName().equals("Load Game")) {
             try {
-                jsonHandler.saveSessionData(this);
-            } catch (IOException e) {
+                loadGame((File) event.getNewValue());
+                requestToRefreshDisplay();
+            } catch (FileNotFoundException e) {
+                requestToDisplayMessage(MSG_FAILED_TO_LOAD);
                 e.printStackTrace();
-                listeners.forEach(damkaDisplay -> {
-                    damkaDisplay.refreshDisplay();
-                    damkaDisplay.displayMessage(MSG_FAILED_TO_SAVE);
-                });
             }
-            listeners.forEach(damkaDisplay -> {
-                damkaDisplay.refreshDisplay();
-                damkaDisplay.displayMessage(MSG_SAVED);
-            });
         }
+    }
 
+    private void saveGame() {
+        try {
+            jsonHandler.saveSessionData(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+            requestToDisplayMessage(MSG_FAILED_TO_SAVE);
+        }
+        requestToDisplayMessage(MSG_SAVED);
+    }
+
+    private void requestToDisplayMessage(String msgFailedToSave) {
+        listeners.forEach(damkaDisplay -> {
+            damkaDisplay.refreshDisplay();
+            damkaDisplay.displayMessage(msgFailedToSave);
+        });
+    }
+
+    private void loadGame(File fileOpened) throws FileNotFoundException {
+        jsonHandler.loadSessionData(fileOpened, board, getPlayer1(),getPlayer2());
     }
 
     private void restartSession() {

@@ -72,4 +72,12 @@ public class Board {
         this.board = new Pawn[CELLS_IN_ROW][CELLS_IN_ROW];
         fillBoard(p1, p2);
     }
+
+    public void setBoard(Pawn[][] board) {
+        this.board = board;
+    }
+
+    public Pawn[][] getBoardMatrix() {
+        return board;
+    }
 }

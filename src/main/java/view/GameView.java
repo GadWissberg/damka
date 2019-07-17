@@ -13,6 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 public class GameView extends JPanel {
     private static final String IMAGE_BACKGROUND = GameWindow.RSC_FOLDER + "background.jpg";
@@ -70,7 +71,7 @@ public class GameView extends JPanel {
             currentTurnLabel = new DamkaLabel("");
             updateCurrentTurnLabel();
             addLabel(currentTurnLabel, 1, 0);
-            JPanel buttons = createViewButtons();
+            JPanel buttons = createMenu();
             addPanel(buttons, 3, 0);
             createBoard(viewListener);
         } catch (IOException e) {
@@ -80,20 +81,40 @@ public class GameView extends JPanel {
         }
     }
 
-    private JPanel createViewButtons() {
+    private JPanel createMenu() {
         JPanel buttons = new JPanel();
         buttons.setBackground(new Color(0, 0, 0, 0));
         buttons.add(createRestartButton());
         buttons.add(createShowStatButton());
         buttons.add(createSaveGameButton());
+        buttons.add(createLoadGameButton());
         buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
         return buttons;
     }
 
+    private JButton createLoadGameButton() {
+        JButton button = new JButton("Load Game");
+        button.addActionListener(e -> {
+            Optional<File> file = Optional.ofNullable(openFile());
+            file.ifPresent(value -> propertyChangeHandler.firePropertyChange("Load Game", null, value));
+        });
+        return button;
+    }
+
+    private File openFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        int returnValue = fileChooser.showOpenDialog(null);
+        File result = null;
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            result = fileChooser.getSelectedFile();
+        }
+        return result;
+    }
+
     private JButton createSaveGameButton() {
-        JButton showGameStat = new JButton("Save Game");
-        showGameStat.addActionListener(e -> propertyChangeHandler.firePropertyChange("Save Game", false, true));
-        return showGameStat;
+        JButton button = new JButton("Save Game");
+        button.addActionListener(e -> propertyChangeHandler.firePropertyChange("Save Game", false, true));
+        return button;
     }
 
     private JButton createShowStatButton() {
