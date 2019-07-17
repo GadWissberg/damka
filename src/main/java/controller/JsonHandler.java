@@ -110,6 +110,8 @@ public class JsonHandler {
     public void loadSessionData(File fileOpened, Board board, Player player1, Player player2) throws FileNotFoundException {
         JsonObject jsonObject = gson.fromJson(new FileReader(fileOpened), JsonObject.class);
         board.setBoard(inflateBoard(jsonObject, player1, player2));
+        player1.setScore(jsonObject.getAsJsonObject("player1").get("score").getAsInt());
+        player2.setScore(jsonObject.getAsJsonObject("player2").get("score").getAsInt());
     }
 
     private Pawn[][] inflateBoard(JsonObject fromJson, Player player1, Player player2) {
